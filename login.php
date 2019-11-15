@@ -44,7 +44,7 @@ if (!empty($_POST)) {
 
 
         // ＊保存パスワード　＝　入力パスワード かつ　ロック中ではない時
-        if ($member['password'] === sha1($_POST['password']) && $member['lock_flg'] === '0') {
+        if (password_verify($_POST['password'], $member['password']) && $member['lock_flg'] === '0') {
             //ログイン成功：失敗項目の初期化
             $login = $db->prepare('UPDATE m_users SET login_fail_date= null, login_fail_cut= 0, lock_date= null, last_login_date=?, lock_flg= 0 WHERE user_id=?');
             $login->execute(array(date("Ymd"),$member['user_id']));
