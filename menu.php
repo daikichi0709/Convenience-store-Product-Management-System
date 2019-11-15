@@ -2,7 +2,7 @@
 session_start();
 // DB接続
 try {
-    $db = new PDO('mysql:dbname=conveni_db;host=127.0.0.1; charset=utf8', 'root', '');
+    $db = new PDO('mysql:dbname=conveni_db;host=127.0.0.1; charset=utf8', 'daikichi', 'daiki');
 } catch (PDOException $e) {
     print('DB接続エラー：' . $e->getMessage());
     exit();
@@ -11,6 +11,12 @@ if(empty($_SESSION['login'])){
     header('Location: login.php');
     exit();
 }
+    $keyid = $_SESSION['login']['user_id'];
+    $login2 = $db->prepare('SELECT user_name, auth FROM m_users WHERE user_id=?');
+    $login2->execute(array($keyid));
+    $member2 = $login2->fetch();
+
+
 ?>
 
 <!DOCTYPE html>
@@ -25,7 +31,7 @@ if(empty($_SESSION['login'])){
     <style>
         html,
         body {
-            height: 100;
+            height: 80%;
             text-align: center;
             margin-top: 20px;
         }
@@ -39,8 +45,8 @@ if(empty($_SESSION['login'])){
 <body>
     <div>
         <h1>商品管理システム</h1>
-        <p>ログインユーザー名：<?php print($_SESSION['login']['user_name']) ?></p>
-        <hr><br>
+        <p style="font-size: 24px;">ログインユーザー名：<strong><?php print($member2['user_name']." auth= \n".$member2['auth']) ?></strong></p>
+        <br>
         <div style="display:inline-flex">
             <!-- 在庫管理一覧へ画面遷移 -->
             <form action="stock.php">
@@ -49,7 +55,7 @@ if(empty($_SESSION['login'])){
                 </div>
             </form>
 
-            <?php if($_SESSION['login']['auth'] === "1") :?>
+            <?php if($member2['auth'] === "1") :?>
             <!-- ユーザー管理一覧へ画面遷移 -->
             <form action="users.php">
                 <div>
@@ -61,7 +67,7 @@ if(empty($_SESSION['login'])){
         <br><br>
         <form action="login.php">
             <div>
-            <input type="submit" value="ログアウト" style="width: 200px;">
+            <input type="submit" value="ログアウト" style="font-size: 20px; height: 80px;width: 200px;">
             </div>
         </form>
     </div>
