@@ -51,8 +51,6 @@ if (!empty($_POST)) {
 
             // SESSIONにユーザーID保持
             $_SESSION['login']['user_id'] = $member['user_id'];
-            $_SESSION['login']['user_name'] = $member['user_name'];
-            $_SESSION['login']['auth'] = $member['auth'];
 
             // エラー内容の初期化
             $error['login'] = '';
