@@ -15,7 +15,7 @@ if (!empty($_POST)) {
     $email = $_POST['email'];
     // ＊メアドとパスワードが共に入力されているか
     if ($_POST['email'] !== '' && $_POST['password'] !== '') {
-        $login = $db->prepare('SELECT * FROM m_users WHERE email=?');
+        $login = $db->prepare('SELECT user_id, email, password, login_fail_date, lock_flg, login_fail_cut FROM m_users WHERE email=?');
         $login->execute(array($_POST['email']));
         $member = $login->fetch();
 
@@ -87,7 +87,7 @@ if (!empty($_POST)) {
         }
     }
 }
-unset($_SESSION['login']);
+session_destroy();
 ?>
 
 <!DOCTYPE html>
