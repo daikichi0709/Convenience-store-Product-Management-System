@@ -1,20 +1,16 @@
 <?php
 session_start();
 // DB接続
-try {
-    $db = new PDO('mysql:dbname=conveni_db;host=127.0.0.1; charset=utf8', 'daikichi', 'daiki');
-} catch (PDOException $e) {
-    print('DB接続エラー：' . $e->getMessage());
-    exit();
-}
+require('dbconnect.php');
+
 if(empty($_SESSION['login'])){
     header('Location: login.php');
     exit();
 }
     $keyid = $_SESSION['login']['user_id'];
-    $login2 = $db->prepare('SELECT user_name, auth FROM m_users WHERE user_id=?');
-    $login2->execute(array($keyid));
-    $member2 = $login2->fetch();
+    $login_userdata = $db->prepare('SELECT user_name, auth FROM m_users WHERE user_id=?');
+    $login_userdata->execute(array($keyid));
+    $member2 = $login_userdata->fetch();
 
 
 ?>
