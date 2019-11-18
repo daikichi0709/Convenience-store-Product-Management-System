@@ -1,16 +1,11 @@
 <?php
 session_start();
 // DB接続
-try {
-    $db = new PDO('mysql:dbname=conveni_db;host=127.0.0.1; charset=utf8', 'daikichi', 'daiki');
-} catch (PDOException $e) {
-    print('DB接続エラー：' . $e->getMessage());
-    exit();
-}
+require('dbconnect.php');
 
 if (!empty($_POST)) {
     //ログイン失敗したら（一度チェックを通過するから）
-    $error['login'] = '* ログインに失敗しました';
+    $error['login'] = 'ログインに失敗しました';
 
     $email = $_POST['email'];
     // ＊メアドとパスワードが共に入力されているか
@@ -58,7 +53,7 @@ if (!empty($_POST)) {
             exit();
         } elseif ($member['lock_flg'] === '1' || $member['lock_flg'] === '9') {
             // ＊ロック中
-            $error['login'] = '* ロック中です。<br>あと'. (10 - $difference) . '分でロックが解除されます。';
+            $error['login'] = 'ロック中です。';
         } else {
             // ＊パスワードが一致しない時
             $logmiss = $member['login_fail_cut'] + 1;
@@ -67,7 +62,7 @@ if (!empty($_POST)) {
                 // ３回ログインミスした時
                 $penalty = $db->prepare('UPDATE m_users SET lock_date= ?, lock_flg=?, login_fail_cut=?, login_fail_date=? WHERE email=?');
                 $penalty->execute(array($misstime,1,$logmiss,$misstime,$_POST['email']));
-                $error['login'] = '* ログインに規定回数以上失敗したため、ロックしました。時間をおいて再ログインしてください。';
+                $error['login'] = 'ログインに規定回数以上失敗したため、ロックしました。時間をおいて再ログインしてください。';
 
             } else {
                 // ＊3回未満のログインミス
