@@ -5,4 +5,3 @@ try {
     print('DB接続エラー：' . $e->getMessage());
     exit();
 }
-?>
