@@ -3,10 +3,7 @@ session_start();
 // DB接続
 require('dbconnect.php');
 
-if(empty($_SESSION['login'])){
-    header('Location: login.php');
-    exit();
-}
+
     $keyid = $_SESSION['login']['user_id'];
     $login_userdata = $db->prepare('SELECT user_name, auth FROM m_users WHERE user_id=?');
     $login_userdata->execute(array($keyid));
