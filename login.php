@@ -53,7 +53,7 @@ if (!empty($_POST)) {
             exit();
         } elseif ($member['lock_flg'] === '1' || $member['lock_flg'] === '9') {
             // ＊ロック中
-            $error['login'] = 'ロック中です。';
+            $error['login'] = 'ロック中です';
         } else {
             // ＊パスワードが一致しない時
             $logmiss = $member['login_fail_cut'] + 1;
@@ -62,10 +62,10 @@ if (!empty($_POST)) {
                 // ３回ログインミスした時
                 $penalty = $db->prepare('UPDATE m_users SET lock_date= ?, lock_flg=?, login_fail_cut=?, login_fail_date=? WHERE email=?');
                 $penalty->execute(array($misstime,1,$logmiss,$misstime,$_POST['email']));
-                $error['login'] = 'ログインに規定回数以上失敗したため、ロックしました。時間をおいて再ログインしてください。';
+                $error['login'] = 'ログインに規定回数以上失敗したため、ロックしました。時間をおいて再ログインしてください';
 
             } else {
-                // ＊3回未満のログインミス
+                // ＊３回未満のログインミス
                 $penalty = $db->prepare('UPDATE m_users SET login_fail_cut=?, login_fail_date=? WHERE email=?');
                 $penalty->execute(array($logmiss,$misstime,$_POST['email']));
             }
