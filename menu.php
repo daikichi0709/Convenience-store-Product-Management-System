@@ -38,7 +38,7 @@ require('dbconnect.php');
 <body>
     <div>
         <h1>商品管理システム</h1>
-        <p style="font-size: 24px;">ログインユーザー名：<strong><?php print($member2['user_name']." auth= \n".$member2['auth']) ?></strong></p>
+        <p style="font-size: 24px;">ログインユーザー名：<strong><?php print($member2['user_name']) ?></strong></p>
         <br>
         <div style="display:inline-flex">
             <!-- 在庫管理一覧へ画面遷移 -->
