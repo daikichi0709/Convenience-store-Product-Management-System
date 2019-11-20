@@ -17,7 +17,9 @@ if (!empty($_POST)) {
 
         // ログインしようとした時の日時
         $today = new DateTime();
-        $misstime = $today->format('Y-m-d H:i:s');
+        $datetime = $today->format('Y-m-d H:i:s');
+
+
         if (!empty($member['login_fail_date'])) {
             // 前回のログインミスの日時
             $pastday = $member['login_fail_date'];
@@ -31,10 +33,10 @@ if (!empty($_POST)) {
             // 「年,月,日,時」⇒「分」
             $difference = ((($interval['year'] * 12 + $interval['month']) * 30 + $interval['day']) * 24 + $interval['hour']) * 60 + $interval['minute'];
 
-            // １０分以上経過ならばロックカウント、ロックフラグの初期化
-            if ($difference >= "10") {
-                $login = $db->prepare('UPDATE m_users SET login_fail_date= null, login_fail_cut= 0, lock_date= null, lock_flg= 0 WHERE user_id=?');
-                $login->execute(array($member['user_id']));
+            // １０分以上経過 ＆ 管理者からのロックではない時、ならばロックカウント、ロックフラグの初期化
+            if ($difference >= "10" and $member['lock_flg'] !== "9") {
+                $login = $db->prepare('UPDATE m_users SET login_fail_date= null, login_fail_cut= 0, lock_date= null, lock_flg= 0, last_login_date=?,	upd_date=?, , upd_user_id=? WHERE user_id=?');
+                $login->execute(array($datetime,$datetime,$member['user_id'],$member['user_id']));
             }
         }
 
@@ -42,8 +44,8 @@ if (!empty($_POST)) {
         // ＊保存パスワード　＝　入力パスワード かつ　ロック中ではない時
         if (password_verify($_POST['password'], $member['password']) && $member['lock_flg'] === '0') {
             //ログイン成功：失敗項目の初期化
-            $login = $db->prepare('UPDATE m_users SET login_fail_date= null, login_fail_cut= 0, lock_date= null, last_login_date=?, lock_flg= 0 WHERE user_id=?');
-            $login->execute(array(date("Ymd"),$member['user_id']));
+            $login = $db->prepare('UPDATE m_users SET login_fail_date= null, login_fail_cut= 0, lock_date= null, last_login_date=?, lock_flg= 0, upd_date=?,  upd_user_id=? WHERE user_id=?');
+            $login->execute(array($datetime,$datetime,$member['user_id'],$member['user_id']));
 
             // SESSIONにユーザーID保持
             $_SESSION['login']['user_id'] = $member['user_id'];
@@ -61,14 +63,14 @@ if (!empty($_POST)) {
 
             if ($logmiss === 3) {
                 // ３回ログインミスした時
-                $penalty = $db->prepare('UPDATE m_users SET lock_date= ?, lock_flg=?, login_fail_cut=?, login_fail_date=? WHERE email=?');
-                $penalty->execute(array($misstime,1,$logmiss,$misstime,$_POST['email']));
+                $penalty = $db->prepare('UPDATE m_users SET lock_date= ?, lock_flg=?, login_fail_cut=?, login_fail_date=?, last_login_date=?, upd_date=?,  upd_user_id=? WHERE email=?');
+                $penalty->execute(array($datetime,1,$logmiss,$datetime,$datetime,$datetime,$member['user_id'],$_POST['email']));
                 $error['login'] = 'ログインに規定回数以上失敗したため、ロックしました。時間をおいて再ログインしてください';
 
             } else {
                 // ＊３回未満のログインミス
-                $penalty = $db->prepare('UPDATE m_users SET login_fail_cut=?, login_fail_date=? WHERE email=?');
-                $penalty->execute(array($logmiss,$misstime,$_POST['email']));
+                $penalty = $db->prepare('UPDATE m_users SET login_fail_cut=?, login_fail_date=?, last_login_date=?,	upd_date=?, upd_user_id=? WHERE email=?');
+                $penalty->execute(array($logmiss,$datetime,$datetime,$datetime,$member['user_id'],$_POST['email']));
             }
         }
     } else {
