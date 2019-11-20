@@ -6,7 +6,7 @@ try {
     exit();
 }
 
-if($_REQUEST[$loginpage] !== 0) {
+if(isset($_REQUEST[$loginpage]) && $_REQUEST[$loginpage] !== "0") {
     if(empty($_SESSION['login'])){
     header('Location: login.php');
     exit();
