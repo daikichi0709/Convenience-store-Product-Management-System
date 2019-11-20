@@ -7,7 +7,7 @@ require('dbconnect.php');
     $keyid = $_SESSION['login']['user_id'];
     $login_userdata = $db->prepare('SELECT user_name, auth FROM m_users WHERE user_id=?');
     $login_userdata->execute(array($keyid));
-    $member2 = $login_userdata->fetch();
+    $member = $login_userdata->fetch();
 
 
 ?>
@@ -38,7 +38,7 @@ require('dbconnect.php');
 <body>
     <div>
         <h1>商品管理システム</h1>
-        <p style="font-size: 24px;">ログインユーザー名：<strong><?php print($member2['user_name']) ?></strong></p>
+        <p style="font-size: 24px;">ログインユーザー名：<strong><?php print($member['user_name']." auth= \n".$member['auth']) ?></strong></p>
         <br>
         <div style="display:inline-flex">
             <!-- 在庫管理一覧へ画面遷移 -->
@@ -48,7 +48,7 @@ require('dbconnect.php');
                 </div>
             </form>
 
-            <?php if($member2['auth'] === "1") :?>
+            <?php if($member['auth'] === "1") :?>
             <!-- ユーザー管理一覧へ画面遷移 -->
             <form action="users.php">
                 <div>
