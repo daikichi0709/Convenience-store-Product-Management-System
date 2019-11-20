@@ -5,3 +5,10 @@ try {
     print('DB接続エラー：' . $e->getMessage());
     exit();
 }
+
+if($_REQUEST[$loginpage] !== 0) {
+    if(empty($_SESSION['login'])){
+    header('Location: login.php');
+    exit();
+    }
+}
