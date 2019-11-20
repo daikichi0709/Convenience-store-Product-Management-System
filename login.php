@@ -35,8 +35,8 @@ if (!empty($_POST)) {
 
             // １０分以上経過 ＆ 管理者からのロックではない時、ならばロックカウント、ロックフラグの初期化
             if ($difference >= "10" and $member['lock_flg'] !== "9") {
-                $login = $db->prepare('UPDATE m_users SET login_fail_date= null, login_fail_cut= 0, lock_date= null, lock_flg= 0, last_login_date=?,	upd_date=?, , upd_user_id=? WHERE user_id=?');
-                $login->execute(array($datetime,$datetime,$member['user_id'],$member['user_id']));
+                $login = $db->prepare('UPDATE m_users SET login_fail_date= null, login_fail_cut= 0, lock_date= null, lock_flg= 0, upd_date=?, upd_user_id=? WHERE user_id=?');
+                $login->execute(array($datetime,$member['user_id'],$member['user_id']));
             }
         }
 
@@ -63,14 +63,14 @@ if (!empty($_POST)) {
 
             if ($logmiss === 3) {
                 // ３回ログインミスした時
-                $penalty = $db->prepare('UPDATE m_users SET lock_date= ?, lock_flg=?, login_fail_cut=?, login_fail_date=?, last_login_date=?, upd_date=?,  upd_user_id=? WHERE email=?');
-                $penalty->execute(array($datetime,1,$logmiss,$datetime,$datetime,$datetime,$member['user_id'],$_POST['email']));
+                $penalty = $db->prepare('UPDATE m_users SET lock_date= ?, lock_flg=?, login_fail_cut=?, login_fail_date=?, upd_date=?, upd_user_id=? WHERE email=?');
+                $penalty->execute(array($datetime,1,$logmiss,$datetime,$datetime,$member['user_id'],$_POST['email']));
                 $error['login'] = 'ログインに規定回数以上失敗したため、ロックしました。時間をおいて再ログインしてください';
 
             } else {
                 // ＊３回未満のログインミス
-                $penalty = $db->prepare('UPDATE m_users SET login_fail_cut=?, login_fail_date=?, last_login_date=?,	upd_date=?, upd_user_id=? WHERE email=?');
-                $penalty->execute(array($logmiss,$datetime,$datetime,$datetime,$member['user_id'],$_POST['email']));
+                $penalty = $db->prepare('UPDATE m_users SET login_fail_cut=?, login_fail_date=?, upd_date=?, upd_user_id=? WHERE email=?');
+                $penalty->execute(array($logmiss,$datetime,$datetime,$member['user_id'],$_POST['email']));
             }
         }
     } else {
