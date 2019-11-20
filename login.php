@@ -1,4 +1,5 @@
 <?php
+$_REQUEST[$loginpage] = 0;
 session_start();
 // DB接続
 require('dbconnect.php');
