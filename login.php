@@ -2,7 +2,7 @@
 $_REQUEST['loginpage'] = 1;
 session_start();
 // DB接続
-require('dbconnect.php');
+require('Common.php');
 
 if (!empty($_POST)) {
     //ログイン失敗したら（一度チェックを通過するから）
