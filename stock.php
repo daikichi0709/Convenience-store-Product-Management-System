@@ -1,7 +1,7 @@
 <?php
 session_start();
 // DB接続
-require('dbconnect.php');
+require('Common.php');
 
 
 $page = $_REQUEST['page'];
@@ -11,7 +11,8 @@ if ($page == '') {
 }
 $page = max($page, 1);
 
-$itemcnt = $db->query('SELECT COUNT(*) AS cnt FROM t_inventories');
+//削除フラグが「1」のモノはカウントしない
+$itemcnt = $db->query('SELECT COUNT(*) AS cnt FROM t_inventories WHERE NOT del_flg = 1 ');
 $cnt = $itemcnt->fetch();
 $maxPage = ceil($cnt['cnt'] / 10); //ceil():切り上げ
 
@@ -20,7 +21,8 @@ $page = min($page, $maxPage);
 //出力ページで出す項目の一番上の番号の計算式
 $start = ($page - 1) * 10;
 
-$items = $db->prepare('SELECT item_id, item_name, price, stock, day FROM t_inventories ORDER BY item_id ASC LIMIT ?,10');
+//削除フラグが「1」のモノは取得しない
+$items = $db->prepare('SELECT item_id, item_name, price, stock, del_flg, day FROM t_inventories WHERE NOT del_flg = 1 ORDER BY item_id ASC LIMIT ?,10');
 $items->bindParam(1, $start, PDO::PARAM_INT);
 $items->execute();
 
@@ -28,7 +30,6 @@ $keyid = $_SESSION['login']['user_id'];
 $login_userdata = $db->prepare('SELECT auth FROM m_users WHERE user_id=?');
 $login_userdata->execute(array($keyid));
 $auth = $login_userdata->fetch();
-
 ?>
 
 <!DOCTYPE html>
@@ -66,6 +67,7 @@ $auth = $login_userdata->fetch();
         <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
             <p style="font-size: 20px; margin-right: 10%; text-align: right;">
                 <a href="ins_product.php">新規追加</a>
+                <!--↓↓↓↓↓↓↓↓↓　CSVダウンロード未実装　↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓-->
                 <a href="">CSVダウンロード</a>
             </p><?php endif; ?>
 
@@ -87,22 +89,24 @@ $auth = $login_userdata->fetch();
 
                 <!-- 2行目以降：項目 -->
                 <?php while ($item = $items->fetch()) : ?>
-                    <tr>
-                        <td><?php print($item['item_id']) ?></td>
-                        <td><?php print($item['item_name']) ?></td>
-                        <td><?php print($item['price']) ?></td>
-                        <td><?php print($item['stock']) ?></td>
-                        <td><?php print($item['day']) ?></td>
+                    <?php if ($item['del_flg'] === "0") : ?>
+                        <tr>
+                            <td><?php print($item['item_id']) ?></td>
+                            <td><?php print($item['item_name']) ?></td>
+                            <td><?php print($item['price']) ?></td>
+                            <td><?php print($item['stock']) ?></td>
+                            <td><?php print($item['day']) ?></td>
 
-                        <!-- 権限が「1」「2」のユーザーのみの仕様 -->
-                        <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
-                            <th>
-                                <a href="upd_product.php?item_id=<?php print($item['item_id']); ?>">編集</a>
-                                |<a href="">削除</a>
-                            </th>
-                        <?php endif; ?>
-                    </tr>
-
+                            <!-- 権限が「1」「2」のユーザーのみの仕様 -->
+                            <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
+                                <th>
+                                    <a href="upd_product.php?item_id=<?php print($item['item_id']); ?>">編集</a>
+                                    |<a href="del_product.php?item_id=<?php print($item['item_id']); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
+                                </th>
+                            <?php endif; ?>
+                        </tr>
+                    <?php elseif ($item['del_flg'] === 1) : ?>
+                    <?php endif; ?>
                 <?php endwhile; ?>
 
                 </p>
