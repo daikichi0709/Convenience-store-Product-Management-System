@@ -6,7 +6,7 @@ require('Common.php');
 
 $page = $_REQUEST['page'];
 
-if ($page == '') {
+if (empty($page)) {
     $page = 1;
 }
 $page = max($page, 1);
@@ -40,7 +40,7 @@ $auth = $login_userdata->fetch();
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width,">
-    <title>タイトルを入力してください</title>
+    <title>商品管理システム【在庫一覧画面】</title>
     <!-- <link rel="stylesheet" href="style.css"> -->
     <style>
         html,
@@ -91,18 +91,20 @@ $auth = $login_userdata->fetch();
                 <?php while ($item = $items->fetch()) : ?>
                     <?php if ($item['del_flg'] === "0") : ?>
                         <tr>
-                            <td><?php print($item['item_id']) ?></td>
-                            <td><?php print($item['item_name']) ?></td>
-                            <td><?php print($item['price']) ?></td>
-                            <td><?php print($item['stock']) ?></td>
-                            <td><?php print($item['day']) ?></td>
+                            <td><?php print(htmlspecialchars($item['item_id'])) ?></td>
+                            <td><?php print(htmlspecialchars($item['item_name'])) ?></td>
+                            <td><?php print(htmlspecialchars($item['price'])) ?></td>
+                            <td><?php print(htmlspecialchars($item['stock'])) ?></td>
+                            <td><?php print(htmlspecialchars($item['day'])) ?></td>
 
                             <!-- 権限が「1」「2」のユーザーのみの仕様 -->
                             <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
-                                <th>
-                                    <a href="upd_product.php?item_id=<?php print($item['item_id']); ?>">編集</a>
-                                    |<a href="del_product.php?item_id=<?php print($item['item_id']); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
-                                </th>
+                                <td>
+                                    <center>
+                                        <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>">編集</a>
+                                        |<a href="del_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
+                                    </center>
+                                </td>
                             <?php endif; ?>
                         </tr>
                     <?php elseif ($item['del_flg'] === 1) : ?>
@@ -125,28 +127,28 @@ $auth = $login_userdata->fetch();
         <?php endif; ?>
 
         <?php if ($page > 1) : ?>
-            <a href="stock.php?page=<?php print($page - 1); ?>">〈</a>
+            <a href="stock.php?page=<?php print(htmlspecialchars($page - 1)); ?>">〈</a>
             <?php else : ?>〈
         <?php endif; ?>
 
         <?php for ($pagecut = 1; $pagecut <= $maxPage; $pagecut++) : ?>
-            <a href="stock.php?page=<?php print($pagecut); ?>"><?php print($pagecut); ?></a>
+            <a href="stock.php?page=<?php print(htmlspecialchars($pagecut)); ?>"><?php print(htmlspecialchars($pagecut)); ?></a>
         <?php endfor; ?>
 
         <?php if ($page < $maxPage) : ?>
-            <a href="stock.php?page=<?php print($page + 1); ?>">〉</a>
+            <a href="stock.php?page=<?php print(htmlspecialchars($page + 1)); ?>">〉</a>
             <?php else : ?>〉
         <?php endif; ?>
 
         <?php if ($page < $maxPage) : ?>
-            <a href="stock.php?page=<?php print($maxPage); ?>">》</a>
+            <a href="stock.php?page=<?php print(htmlspecialchars($maxPage)); ?>">》</a>
             <?php else : ?>》
         <?php endif; ?>
     </p>
 
     </div>
     <a href="menu.php">
-        <p style="margin-left: 10%; text-align: left;">≪ 戻る
+        <p style="margin-left: 10%; text-align: left;">≪ 戻る</p>
     </a>
 </body>
 
