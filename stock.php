@@ -12,7 +12,7 @@ if (empty($page)) {
 $page = max($page, 1);
 
 //削除フラグが「1」のモノはカウントしない
-$itemcnt = $db->query('SELECT COUNT(*) AS cnt FROM t_inventories WHERE NOT del_flg = 1 ');
+$itemcnt = $db->query('SELECT COUNT(*) AS cnt FROM t_inventories WHERE del_flg  <>1 ');
 $cnt = $itemcnt->fetch();
 $maxPage = ceil($cnt['cnt'] / 10); //ceil():切り上げ
 
@@ -22,7 +22,7 @@ $page = min($page, $maxPage);
 $start = ($page - 1) * 10;
 
 //削除フラグが「1」のモノは取得しない
-$items = $db->prepare('SELECT item_id, item_name, price, stock, del_flg, day FROM t_inventories WHERE NOT del_flg = 1 ORDER BY item_id ASC LIMIT ?,10');
+$items = $db->prepare('SELECT item_id, item_name, price, stock, del_flg, day FROM t_inventories WHERE del_flg <> 1 ORDER BY item_id ASC LIMIT ?,10');
 $items->bindParam(1, $start, PDO::PARAM_INT);
 $items->execute();
 
@@ -30,6 +30,7 @@ $keyid = $_SESSION['login']['user_id'];
 $login_userdata = $db->prepare('SELECT auth FROM m_users WHERE user_id=?');
 $login_userdata->execute(array($keyid));
 $auth = $login_userdata->fetch();
+
 ?>
 
 <!DOCTYPE html>
@@ -67,56 +68,49 @@ $auth = $login_userdata->fetch();
         <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
             <p style="font-size: 20px; margin-right: 10%; text-align: right;">
                 <a href="ins_product.php">新規追加</a>
-                <!--↓↓↓↓↓↓↓↓↓　CSVダウンロード未実装　↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓-->
-                <a href="">CSVダウンロード</a>
+                <a href="download.php">CSVダウンロード</a>
             </p><?php endif; ?>
 
 
-        <center>
-            <table border="3" style="font-size: 24px;">
-                <!-- 1行目：項目名 -->
+        <table align="center" border="3" style="font-size: 24px;">
+
+            <tr>
+                <th>NO.</th>
+                <th>商品名</th>
+                <th>価格</th>
+                <th>在庫数</th>
+                <th>入荷日</th>
+
+                <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
+                    <th>　</th>
+                <?php endif; ?>
+            </tr>
+
+
+            <?php while ($item = $items->fetch()) : ?>
                 <tr>
-                    <th>NO.</th>
-                    <th>商品名</th>
-                    <th>価格</th>
-                    <th>在庫数</th>
-                    <th>入荷日</th>
-                    <!-- 権限が「1」「2」のユーザーのみの仕様 -->
+                    <td><?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($item['item_name'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($item['price'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($item['stock'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($item['day'], ENT_QUOTES)) ?></td>
+
+
                     <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
-                        <th>　</th>
+                        <td align="center">
+
+                            <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>">編集</a>
+                            |<a href="del_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
+
+                        </td>
                     <?php endif; ?>
                 </tr>
+            <?php endwhile; ?>
 
-                <!-- 2行目以降：項目 -->
-                <?php while ($item = $items->fetch()) : ?>
-                    <?php if ($item['del_flg'] === "0") : ?>
-                        <tr>
-                            <td><?php print(htmlspecialchars($item['item_id'])) ?></td>
-                            <td><?php print(htmlspecialchars($item['item_name'])) ?></td>
-                            <td><?php print(htmlspecialchars($item['price'])) ?></td>
-                            <td><?php print(htmlspecialchars($item['stock'])) ?></td>
-                            <td><?php print(htmlspecialchars($item['day'])) ?></td>
-
-                            <!-- 権限が「1」「2」のユーザーのみの仕様 -->
-                            <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
-                                <td>
-                                    <center>
-                                        <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>">編集</a>
-                                        |<a href="del_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
-                                    </center>
-                                </td>
-                            <?php endif; ?>
-                        </tr>
-                    <?php elseif ($item['del_flg'] === 1) : ?>
-                    <?php endif; ?>
-                <?php endwhile; ?>
-
-                </p>
+            </p>
     </div>
 
     </table>
-    </center>
-
     <br>
 
     <p style="margin-right: 20%; text-align: right;">
