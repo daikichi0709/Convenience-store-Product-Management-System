@@ -11,6 +11,112 @@ if (isset($_REQUEST['item_id']) && is_numeric($_REQUEST['item_id'])) {
     $item = $items->fetch();
 }
 
+if (!empty($_POST)) {
+    $_SESSION['item'] = $_POST;
+    $errormessage  = '';
+
+    // 商品名
+    if (empty($_SESSION['item']['item_name'])) {
+        $errormessage .= "商品名が未入力です" . "<br />";
+    } else {
+        if (mb_strlen($_SESSION['item']['item_name']) > 30) {
+            $errormessage .= "商品名に入力できる文字数を超えています" . "<br>";
+        }
+    }
+
+    // 商品説明
+    if (empty($_SESSION['item']['item_desc'])) {
+        $errormessage .= "商品説明が未入力です" . "<br>";
+    } else {
+        if (mb_strlen($_SESSION['item']['item_desc']) > 100) {
+            $errormessage .= "商品説明に入力できる文字数を超えています" . "<br>";
+        }
+    }
+
+    // 仕入先
+    if (empty($_SESSION['item']['item_comp'])) {
+        $errormessage .= "仕入先が未入力です" . "<br>";
+    } else {
+        if (mb_strlen($_SESSION['item']['item_comp']) > 20) {
+            $errormessage .= "仕入先に入力できる文字数を超えています" . "<br>";
+        }
+    }
+
+    // 生産国
+    if (empty($_SESSION['item']['country'])) {
+        $errormessage .= "生産国が未入力です<br>";
+    } else {
+        if (mb_strlen($_SESSION['item']['country']) > 10) {
+            $errormessage .= "生産国に入力できる文字数を超えています" . "<br>";
+        }
+    }
+
+    // 価格
+    if (empty($_SESSION['item']['price'])) {
+        $errormessage .= "価格が未入力です" . "<br>";
+    } else {
+        if (preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
+            if (strlen($_SESSION['item']['price']) > 6) {
+                $errormessage .= "価格に設定できる金額を超えています" . "<br>";
+            }
+        } else {
+            $errormessage .= "価格は半角数字で入力してください" . "<br>";
+        }
+    }
+
+    // 仕入れ価格
+    if (empty($_SESSION['item']['w_price'])) {
+        $errormessage .= '仕入れ価格が未入力です<br>';
+    } else {
+
+        echo "ccc";
+        if (preg_match("/^[0-9]+$/", $_SESSION['item']['w_price'])) {
+            if (strlen($_SESSION['item']['w_price']) > 6) {
+                $errormessage .= "仕入れ価格に設定できる金額を超えています" . "<br>";
+                echo "aaa";
+            }
+            echo "bbb";
+        } else {
+            $errormessage .= "仕入れ価格は半角数字で入力してください" . "<br>";
+
+            echo "ddd";
+        }
+    }
+
+
+    // 在庫数
+    if (empty($_SESSION['item']['stock'])) {
+        $errormessage .= "在庫数が未入力です" . "<br>";
+    } else {
+        if (preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
+            if (strlen($_SESSION['item']['stock']) > 3) {
+                $errormessage .= "在庫数に設定できる数量を超えています" . "<br>";
+            }
+        } else {
+            $errormessage .= "在庫数は半角数字で入力してください" . "<br>";
+        }
+    }
+
+
+    // 追加(登録)処理
+    if (empty($errormessage)) {
+        $statement = $db->prepare('UPDATE t_inventories SET item_name=?, item_desc=?, item_comp=?, country=?, price=?, w_price=?, stock=?, del_flg=0, ins_date=?, ins_user_id=?, upd_date=?, upd_user_id=? WHERE item_id=?');
+
+        //日時設定
+        $today = new DateTime();
+        $instime = $today->format('Y-m-d H:i:s');
+
+        $statement->execute(array($_SESSION['item']['item_name'], $_SESSION['item']['item_desc'], $_SESSION['item']['item_comp'],  $_SESSION['item']['country'],  $_SESSION['item']['price'], $_SESSION['item']['w_price'], $_SESSION['item']['stock'], $instime, $_SESSION['login']['user_id'], $instime,  $_SESSION['login']['user_id'], $id));
+
+        unset($_SESSION['item']);
+        if (empty($_SESSION['item'])) {
+            header('Location: stock.php');
+            exit();
+        }
+    }
+} else {
+    unset($_SESSION['item']);
+}
 ?>
 
 
@@ -45,47 +151,78 @@ if (isset($_REQUEST['item_id']) && is_numeric($_REQUEST['item_id'])) {
         <h1>商品編集</h1>
         <hr>
         <!-- エラーメッセージ -->
-        <h3>
-            <?php if (empty($error[''])) : ?>
-                <p>* </p>
-            <?php endif; ?>
-        </h3>
+        <?php if (!empty($errormessage)) : ?>
+            <p style="color: red; font-size: 20px;"><?php echo $errormessage; ?></p>
+        <?php endif; ?>
 
         <form method="post">
             <div style="font-size: 24px">
                 <!-- 商品名 -->
                 <strong style="width: 200px;">商品名　　　　　</strong>
-                <textarea placeholder="商品名を入力して下さい" name="item_name" rows="1" cols="70" maxlength="255" style="font-size: 18px;"><?php print(htmlspecialchars($item['item_name'], ENT_QUOTES)); ?></textarea>
+                <input type="text" placeholder="商品名を入力して下さい" name="item_name" input type="text" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['item'])) {
+                                                                                                                                                                    print(htmlspecialchars($item['item_name'], ENT_QUOTES));
+                                                                                                                                                                } else {
+                                                                                                                                                                    print(htmlspecialchars($_SESSION['item']['item_name'], ENT_QUOTES));
+                                                                                                                                                                }
+                                                                                                                                                                ?>">
 
                 <br><br>
                 <!-- 商品説明 -->
                 <strong style="width: 200px;">商品説明　　　　</strong>
-                <textarea placeholder="商品説明を入力して下さい" name="item_desc" rows="1" cols="70" maxlength="255" style="font-size: 18px;"><?php print(htmlspecialchars($item['item_desc'], ENT_QUOTES)); ?></textarea>
+                <input type="text" placeholder="商品説明を入力して下さい" name="item_desc" input type="text" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['item'])) {
+                                                                                                                                                                    print(htmlspecialchars($item['item_desc'], ENT_QUOTES));
+                                                                                                                                                                } else {
+                                                                                                                                                                    print(htmlspecialchars($_SESSION['item']['item_desc'], ENT_QUOTES));
+                                                                                                                                                                } ?>">
 
                 <br><br>
                 <!-- 仕入先 -->
                 <strong style="width: 200px;">仕入先　　　　　</strong>
-                <textarea placeholder="仕入先を入力して下さい" name="item_comp" rows="1" cols="70" maxlength="255" style="font-size: 18px;"><?php print(htmlspecialchars($item['item_comp'], ENT_QUOTES)); ?></textarea>
+                <input type="text" placeholder="仕入先を入力して下さい" name="item_comp" input type="text" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['item'])) {
+                                                                                                                                                                    print(htmlspecialchars($item['item_comp'], ENT_QUOTES));
+                                                                                                                                                                } else {
+                                                                                                                                                                    print(htmlspecialchars($_SESSION['item']['item_comp'], ENT_QUOTES));
+                                                                                                                                                                } ?>">
 
                 <br><br>
                 <!-- 生産国 -->
                 <strong style="width: 200px;">生産国　　　　　</strong>
-                <textarea placeholder="生産国を入力して下さい" name="country" rows="1" cols="70" maxlength="255" style="font-size: 18px;"><?php print(htmlspecialchars($item['country'], ENT_QUOTES)); ?></textarea>
+                <input type="text" placeholder="生産国を入力して下さい" name="country" input type="text" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['item'])) {
+                                                                                                                                                                print(htmlspecialchars($item['country'], ENT_QUOTES));
+                                                                                                                                                            } else {
+                                                                                                                                                                print(htmlspecialchars($_SESSION['item']['country'], ENT_QUOTES));
+                                                                                                                                                            }
+                                                                                                                                                            ?>">
 
                 <br><br>
                 <!-- 価格 -->
                 <strong style="width: 200px;">価格　　　　　　</strong>
-                <textarea placeholder="価格を入力して下さい" name="price" rows="1" cols="70" maxlength="255" style="font-size: 18px;"><?php print(htmlspecialchars($item['price'], ENT_QUOTES)); ?></textarea>
+                <input type="text" placeholder="価格を入力して下さい" name="price" input type="text" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['item'])) {
+                                                                                                                                                            print(htmlspecialchars($item['price'], ENT_QUOTES));
+                                                                                                                                                        } else {
+                                                                                                                                                            print(htmlspecialchars($_SESSION['item']['price'], ENT_QUOTES));
+                                                                                                                                                        }
+                                                                                                                                                        ?>">
 
                 <br><br>
                 <!-- 仕入れ価格 -->
                 <strong style="width: 200px;">仕入れ価格　　　</strong>
-                <textarea placeholder="仕入れ価格を入力して下さい" name="w_price" rows="1" cols="70" maxlength="255" style="font-size: 18px;"><?php print(htmlspecialchars($item['w_price'], ENT_QUOTES)); ?></textarea>
+                <input type="text" placeholder="仕入れ価格を入力して下さい" name="w_price" input type="text" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['item'])) {
+                                                                                                                                                                    print(htmlspecialchars($item['w_price'], ENT_QUOTES));
+                                                                                                                                                                } else {
+                                                                                                                                                                    print(htmlspecialchars($_SESSION['item']['w_price'], ENT_QUOTES));
+                                                                                                                                                                }
+                                                                                                                                                                ?>">
 
                 <br><br>
                 <!-- 在庫数 -->
                 <strong style="width: 200px;">在庫数　　　　　</strong>
-                <textarea placeholder="在庫数を入力して下さい" name="stock" rows="1" cols="70" maxlength="255" style="font-size: 18px;"><?php print(htmlspecialchars($item['stock'], ENT_QUOTES)); ?></textarea>
+                <input type="text" placeholder="在庫数を入力して下さい" name="stock" input type="text" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['item'])) {
+                                                                                                                                                                print(htmlspecialchars($item['stock'], ENT_QUOTES));
+                                                                                                                                                            } else {
+                                                                                                                                                                print(htmlspecialchars($_SESSION['item']['stock'], ENT_QUOTES));
+                                                                                                                                                            }
+                                                                                                                                                            ?>">
 
             </div>
 
@@ -97,7 +234,7 @@ if (isset($_REQUEST['item_id']) && is_numeric($_REQUEST['item_id'])) {
             </div>
         </form>
     </div>
-    <a href="menu.php">
+    <a href="stock.php">
         <p style="margin-left: 20%; text-align: left;">≪ 戻る
     </a>
 </body>
