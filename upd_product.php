@@ -68,18 +68,12 @@ if (!empty($_POST)) {
     if (empty($_SESSION['item']['w_price'])) {
         $errormessage .= '仕入れ価格が未入力です<br>';
     } else {
-
-        echo "ccc";
         if (preg_match("/^[0-9]+$/", $_SESSION['item']['w_price'])) {
             if (strlen($_SESSION['item']['w_price']) > 6) {
                 $errormessage .= "仕入れ価格に設定できる金額を超えています" . "<br>";
-                echo "aaa";
             }
-            echo "bbb";
         } else {
             $errormessage .= "仕入れ価格は半角数字で入力してください" . "<br>";
-
-            echo "ddd";
         }
     }
 
