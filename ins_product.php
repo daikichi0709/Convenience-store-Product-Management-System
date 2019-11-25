@@ -47,11 +47,11 @@ if (!empty($_POST)) {
     if (empty($_SESSION['item']['price'])) {
         $errormessage .= "価格が未入力です" . "<br>";
     } else {
-        if (is_int($_SESSION['item']['price'])) {
+        if (preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
             if (strlen($_SESSION['item']['price']) > 6) {
                 $errormessage .= "価格に設定できる金額を超えています" . "<br>";
             }
-        } elseif (!preg_match("/^[0-9]+$/", $_SESSION['item']['price'])) {
+        } else {
             $errormessage .= "価格は半角数字で入力してください" . "<br>";
         }
     }
@@ -60,11 +60,11 @@ if (!empty($_POST)) {
     if (empty($_SESSION['item']['w_price'])) {
         $errormessage .= '仕入れ価格が未入力です<br>';
     } else {
-        if (is_int($_SESSION['item']['w_price'])) {
+        if (preg_match("/^[0-9]+$/", $_SESSION['item']['w_price'])) {
             if (strlen($_SESSION['item']['w_price']) > 6) {
                 $errormessage .= "仕入れ価格に設定できる金額を超えています" . "<br>";
             }
-        } elseif (!preg_match("/^[0-9]+$/", $_SESSION['item']['w_price'])) {
+        } else {
             $errormessage .= "仕入れ価格は半角数字で入力してください" . "<br>";
         }
     }
@@ -74,11 +74,11 @@ if (!empty($_POST)) {
     if (empty($_SESSION['item']['stock'])) {
         $errormessage .= "在庫数が未入力です" . "<br>";
     } else {
-        if (is_int($_SESSION['item']['stock'])) {
+        if (preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
             if (strlen($_SESSION['item']['stock']) > 3) {
                 $errormessage .= "在庫数に設定できる数量を超えています" . "<br>";
             }
-        } elseif (!preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
+        } else {
             $errormessage .= "在庫数は半角数字で入力してください" . "<br>";
         }
     }
@@ -141,7 +141,6 @@ if (!empty($_POST)) {
         <h1>商品登録</h1>
         <hr>
         <!-- エラーメッセージ -->
-
         <?php if (!empty($errormessage)) : ?>
             <p style="color: red; font-size: 20px;"><?php echo $errormessage; ?></p>
         <?php endif; ?>
