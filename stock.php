@@ -3,6 +3,7 @@ session_start();
 // DB接続
 require('Common.php');
 
+
 $ok_code = $_SESSION['login']['ok_code'];
 
 $page = $_REQUEST['page'];
@@ -108,10 +109,10 @@ $auth = $login_userdata->fetch();
 
 
                     <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
-                        <td style="text-align: center">
+                        <td style="text-align: center;">
 
-                            <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>">編集</a>
-                            |<a href="del_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
+                            <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>">編集</a>
+                            |<a href="del_product.php?item_id=<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
 
                         </td>
                     <?php endif; ?>
@@ -132,28 +133,28 @@ $auth = $login_userdata->fetch();
         <?php endif; ?>
 
         <?php if ($page > 1) : ?>
-            <a href="stock.php?page=<?php print(htmlspecialchars($page - 1)); ?>">〈</a>
+            <a href="stock.php?page=<?php print(htmlspecialchars(($page - 1), ENT_QUOTES)); ?>">〈</a>
             <?php else : ?>〈
         <?php endif; ?>
 
         <?php for ($pagecut = 1; $pagecut <= $maxPage; $pagecut++) : ?>
-            <a href="stock.php?page=<?php print(htmlspecialchars($pagecut)); ?>"><?php print(htmlspecialchars($pagecut)); ?></a>
+            <a href="stock.php?page=<?php print(htmlspecialchars(($pagecut), ENT_QUOTES)); ?>"><?php print(htmlspecialchars($pagecut, ENT_QUOTES)); ?></a>
         <?php endfor; ?>
 
         <?php if ($page < $maxPage) : ?>
-            <a href="stock.php?page=<?php print(htmlspecialchars($page + 1)); ?>">〉</a>
+            <a href="stock.php?page=<?php print(htmlspecialchars(($page + 1), ENT_QUOTES)); ?>">〉</a>
             <?php else : ?>〉
         <?php endif; ?>
 
         <?php if ($page < $maxPage) : ?>
-            <a href="stock.php?page=<?php print(htmlspecialchars($maxPage)); ?>">》</a>
+            <a href="stock.php?page=<?php print(htmlspecialchars($maxPage, ENT_QUOTES)); ?>">》</a>
             <?php else : ?>》
         <?php endif; ?>
     </p>
 
     </div>
     <a href="menu.php">
-        <p style="margin-left: 10%; text-align: left;"><?php echo $_REQUEST['ok_code']; ?>≪ 戻る</p>
+        <p style="margin-left: 10%; text-align: left;">≪ 戻る</p>
     </a>
 </body>
 
