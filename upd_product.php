@@ -58,47 +58,37 @@ if (!empty($_POST)) {
     }
 
     // 価格
-    if (empty($_SESSION['item']['price'])) {
+    if (preg_match("/^[0-9]+$/", $_SESSION['item']['price'])) {
+        if (strlen($_SESSION['item']['price']) > 6) {
+            $errormessage .= "価格に設定できる金額を超えています" . "<br>";
+        }
+    } elseif (empty($_SESSION['item']['price'])) {
         $errormessage .= "価格が未入力です" . "<br>";
     } else {
-        if (preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
-            if (strlen($_SESSION['item']['price']) > 6) {
-                $errormessage .= "価格に設定できる金額を超えています" . "<br>";
-            }
-        } else {
-            $errormessage .= "価格は半角数字で入力してください" . "<br>";
-        }
+        $errormessage .= "価格は半角数字で入力してください" . "<br>";
     }
 
     // 仕入れ価格
-    if (empty($_SESSION['item']['w_price'])) {
-        if ($_SESSION['item']['w_price'] !== 0) {
-            $errormessage .= '仕入れ価格が未入力です<br>';
+    if (preg_match("/^[0-9]+$/", $_SESSION['item']['w_price'])) {
+        if (strlen($_SESSION['item']['w_price']) > 6) {
+            $errormessage .= "仕入れ価格に設定できる金額を超えています" . "<br>";
         }
+    } elseif (empty($_SESSION['item']['w_price'])) {
+        $errormessage .= '仕入れ価格が未入力です<br>';
     } else {
-        if (preg_match("/^[0-9]+$/", $_SESSION['item']['w_price'])) {
-            if (strlen($_SESSION['item']['w_price']) > 6) {
-                $errormessage .= "仕入れ価格に設定できる金額を超えています" . "<br>";
-            }
-        } else {
-            $errormessage .= "仕入れ価格は半角数字で入力してください" . "<br>";
-        }
+        $errormessage .= "仕入れ価格は半角数字で入力してください" . "<br>";
     }
-
 
     // 在庫数
-    if (empty($_SESSION['item']['stock'])) {
+    if (preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
+        if (strlen($_SESSION['item']['stock']) > 3) {
+            $errormessage .= "在庫数に設定できる数量を超えています" . "<br>";
+        }
+    } elseif (empty($_SESSION['item']['stock'])) {
         $errormessage .= "在庫数が未入力です" . "<br>";
     } else {
-        if (preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
-            if (strlen($_SESSION['item']['stock']) > 3) {
-                $errormessage .= "在庫数に設定できる数量を超えています" . "<br>";
-            }
-        } else {
-            $errormessage .= "在庫数は半角数字で入力してください" . "<br>";
-        }
+        $errormessage .= "在庫数は半角数字で入力してください" . "<br>";
     }
-
 
     // 追加(登録)処理
     if (empty($errormessage)) {
