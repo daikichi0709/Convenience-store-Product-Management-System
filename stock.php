@@ -3,6 +3,7 @@ session_start();
 // DB接続
 require('Common.php');
 
+$ok_code = $_SESSION['login']['ok_code'];
 
 $page = $_REQUEST['page'];
 
@@ -64,6 +65,16 @@ $auth = $login_userdata->fetch();
         <a>
             <h1>在庫一覧</h1>
         </a>
+        <?php if ($ok_code === 1) : ?>
+            <script>
+                alert('登録が完了しました')
+            </script>
+        <?php elseif ($ok_code === 2) : ?>
+            <script>
+                alert('商品が存在しません')
+            </script>
+        <?php endif; ?>
+        <?php $_SESSION['login']['ok_code'] = 0; ?>
 
         <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
             <p style="font-size: 20px; margin-right: 10%; text-align: right;">
@@ -97,7 +108,7 @@ $auth = $login_userdata->fetch();
 
 
                     <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
-                        <td align="center">
+                        <td style="text-align: center">
 
                             <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>">編集</a>
                             |<a href="del_product.php?item_id=<?php print(htmlspecialchars($item['item_id'])); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
@@ -142,7 +153,7 @@ $auth = $login_userdata->fetch();
 
     </div>
     <a href="menu.php">
-        <p style="margin-left: 10%; text-align: left;">≪ 戻る</p>
+        <p style="margin-left: 10%; text-align: left;"><?php echo $_REQUEST['ok_code']; ?>≪ 戻る</p>
     </a>
 </body>
 
