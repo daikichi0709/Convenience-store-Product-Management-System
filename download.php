@@ -20,9 +20,9 @@ $items->execute();
 $csv .= '"商品番号","商品名","商品説明","仕入先","生産国","価格","仕入れ価格","在庫数","入荷日"' . "\r\n";
 
 foreach ($items as $item) {
+    $item['day'] = str_replace('-', '/', $item['day']);
     $csv .= '"' . $item['item_id'] . '","' . $item['item_name'] . '","' . $item['item_desc'] . '","' . $item['item_comp'] . '","' . $item['country'] . '","' . $item['price'] . '","' . $item['w_price'] . '","' . $item['stock'] . '","' . $item['day'] . '"' . "\r\n";
 }
-$csv = str_replace('-', '/', $csv);
 // CSVファイル出力
 echo $csv;
 return;
