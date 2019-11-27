@@ -78,7 +78,7 @@ $auth = $login_userdata->fetch();
                 alert('商品が存在しません')
             </script>
         <?php endif; ?>
-        <?php $_SESSION['result'] = 0; ?>
+        <?php unset($_SESSION['result']); ?>
 
         <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
             <p style="font-size: 20px; margin-right: 10%; text-align: right;">
