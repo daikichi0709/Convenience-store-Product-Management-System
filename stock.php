@@ -4,7 +4,7 @@ session_start();
 require('Common.php');
 
 
-$ok_code = $_SESSION['login']['ok_code'];
+$ok_code = $_SESSION['result'];
 
 $page = $_REQUEST['page'];
 
@@ -78,7 +78,7 @@ $auth = $login_userdata->fetch();
                 alert('商品が存在しません')
             </script>
         <?php endif; ?>
-        <?php $_SESSION['login']['ok_code'] = 0; ?>
+        <?php $_SESSION['result'] = 0; ?>
 
         <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
             <p style="font-size: 20px; margin-right: 10%; text-align: right;">
@@ -116,7 +116,7 @@ $auth = $login_userdata->fetch();
 
                             <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>">編集</a>
                             |<input type="hidden" name="item_id" class="item_id" value="<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>" />
-                            <a class="push" href="" >削除</a>
+                            <a class="push" href="">削除</a>
 
                         </td>
                     <?php endif; ?>
@@ -133,12 +133,9 @@ $auth = $login_userdata->fetch();
 
         <?php if ($page > 1) : ?>
             <a href="stock.php?page=1">《</a>
-            <?php else : ?>《
-        <?php endif; ?>
-
-        <?php if ($page > 1) : ?>
             <a href="stock.php?page=<?php print(htmlspecialchars(($page - 1), ENT_QUOTES)); ?>">〈</a>
-            <?php else : ?>〈
+        <?php else : ?>
+            《〈
         <?php endif; ?>
 
         <?php for ($pagecut = 1; $pagecut <= $maxPage; $pagecut++) : ?>
@@ -147,12 +144,9 @@ $auth = $login_userdata->fetch();
 
         <?php if ($page < $maxPage) : ?>
             <a href="stock.php?page=<?php print(htmlspecialchars(($page + 1), ENT_QUOTES)); ?>">〉</a>
-            <?php else : ?>〉
-        <?php endif; ?>
-
-        <?php if ($page < $maxPage) : ?>
             <a href="stock.php?page=<?php print(htmlspecialchars($maxPage, ENT_QUOTES)); ?>">》</a>
-            <?php else : ?>》
+        <?php else : ?>
+            〉》
         <?php endif; ?>
     </p>
 
