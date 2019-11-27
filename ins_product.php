@@ -3,112 +3,38 @@ session_start();
 // DB接続
 require('Common.php');
 
-if (!empty($_POST)) {
-    $_SESSION['item'] = $_POST;
-    $errormessage  = '';
 
-    // 商品名
-    if (empty($_SESSION['item']['item_name'])) {
-        $errormessage .= "商品名が未入力です" . "<br />";
-    } else {
-        if (mb_strlen($_SESSION['item']['item_name']) > 30) {
-            $errormessage .= "商品名に入力できる文字数を超えています" . "<br>";
-        }
-    }
+$ok_code = $_SESSION['result'];
 
-    // 商品説明
-    if (empty($_SESSION['item']['item_desc'])) {
-        $errormessage .= "商品説明が未入力です" . "<br>";
-    } else {
-        if (mb_strlen($_SESSION['item']['item_desc']) > 100) {
-            $errormessage .= "商品説明に入力できる文字数を超えています" . "<br>";
-        }
-    }
+$page = $_REQUEST['page'];
 
-    // 仕入先
-    if (empty($_SESSION['item']['item_comp'])) {
-        $errormessage .= "仕入先が未入力です" . "<br>";
-    } else {
-        if (mb_strlen($_SESSION['item']['item_comp']) > 20) {
-            $errormessage .= "仕入先に入力できる文字数を超えています" . "<br>";
-        }
-    }
-
-    // 生産国
-    if (empty($_SESSION['item']['country'])) {
-        $errormessage .= "生産国が未入力です<br>";
-    } else {
-        if (mb_strlen($_SESSION['item']['country']) > 10) {
-            $errormessage .= "生産国に入力できる文字数を超えています" . "<br>";
-        }
-    }
-
-    // 価格
-    if (preg_match("/^[0-9]+$/", $_SESSION['item']['price'])) {
-        if (strlen($_SESSION['item']['price']) > 6) {
-            $errormessage .= "価格に設定できる金額を超えています" . "<br>";
-        }
-    } elseif (empty($_SESSION['item']['price'])) {
-        $errormessage .= "価格が未入力です" . "<br>";
-    } else {
-        $errormessage .= "価格は半角数字で入力してください" . "<br>";
-    }
-
-    // 仕入れ価格
-    if (preg_match("/^[0-9]+$/", $_SESSION['item']['w_price'])) {
-        if (strlen($_SESSION['item']['w_price']) > 6) {
-            $errormessage .= "仕入れ価格に設定できる金額を超えています" . "<br>";
-        }
-    } elseif (empty($_SESSION['item']['w_price'])) {
-        $errormessage .= '仕入れ価格が未入力です<br>';
-    } else {
-        $errormessage .= "仕入れ価格は半角数字で入力してください" . "<br>";
-    }
-
-    // 在庫数
-    if (preg_match("/^[0-9]+$/", $_SESSION['item']['stock'])) {
-        if (strlen($_SESSION['item']['stock']) > 3) {
-            $errormessage .= "在庫数に設定できる数量を超えています" . "<br>";
-        }
-    } elseif (empty($_SESSION['item']['stock'])) {
-        $errormessage .= "在庫数が未入力です" . "<br>";
-    } else {
-        $errormessage .= "在庫数は半角数字で入力してください" . "<br>";
-    }
-
-
-    // 入荷日
-    if (empty($_SESSION['item']['day'])) {
-        $errormessage .= "入荷日が未入力です" . "<br>";
-    } else {
-        // 文字列を分割
-        list($Y, $m, $d) = explode("-", $_SESSION['item']['day']);
-        if (!checkdate($m, $d, $Y)) {
-            $errormessage .= "入荷日に不正な日付が指定されています" . "<br>";
-        }
-    }
-
-    // 追加(登録)処理
-    if (empty($errormessage)) {
-        $statement = $db->prepare('INSERT INTO t_inventories SET item_name=?, item_desc=?, item_comp=?, country=?, price=?, w_price=?, stock=?, day=?, del_flg=0, ins_date=?, ins_user_id=?, upd_date=?, upd_user_id=?');
-
-        //日時設定
-        $today = new DateTime();
-        $instime = $today->format('Y-m-d H:i:s');
-
-        $statement->execute(array($_SESSION['item']['item_name'], $_SESSION['item']['item_desc'], $_SESSION['item']['item_comp'],  $_SESSION['item']['country'],  $_SESSION['item']['price'], $_SESSION['item']['w_price'], $_SESSION['item']['stock'], $_SESSION['item']['day'], $instime,  $_SESSION['login']['user_id'], $instime,  $_SESSION['login']['user_id']));
-
-        unset($_SESSION['item']);
-        if (empty($_SESSION['item'])) {
-            $_SESSION['result'] = 1; //登録完了フラグ
-            header('Location: stock.php');
-            exit();
-        }
-    }
-} else {
-    unset($_SESSION['item']);
+if (empty($page)) {
+    $page = 1;
 }
+$page = max($page, 1);
+
+//削除フラグが「1」のモノはカウントしない
+$itemcnt = $db->query('SELECT COUNT(*) AS cnt FROM t_inventories WHERE del_flg  <>1 ');
+$cnt = $itemcnt->fetch();
+$maxPage = ceil($cnt['cnt'] / 10); //ceil():切り上げ
+
+$page = min($page, $maxPage);
+
+//出力ページで出す項目の一番上の番号の計算式
+$start = ($page - 1) * 10;
+
+//削除フラグが「1」のモノは取得しない
+$items = $db->prepare('SELECT item_id, item_name, price, stock, del_flg, day FROM t_inventories WHERE del_flg <> 1 ORDER BY item_id ASC LIMIT ?,10');
+$items->bindParam(1, $start, PDO::PARAM_INT);
+$items->execute();
+
+$keyid = $_SESSION['login']['user_id'];
+$login_userdata = $db->prepare('SELECT auth FROM m_users WHERE user_id=?');
+$login_userdata->execute(array($keyid));
+$auth = $login_userdata->fetch();
+
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -118,7 +44,7 @@ if (!empty($_POST)) {
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width,">
-    <title>商品管理システム【商品登録画面】</title>
+    <title>商品管理システム【在庫一覧画面】</title>
     <!-- <link rel="stylesheet" href="style.css"> -->
     <style>
         html,
@@ -127,72 +53,106 @@ if (!empty($_POST)) {
             text-align: center;
             margin-top: 20px;
         }
+
+        table {
+            width: 80%;
+            height: 40%;
+        }
     </style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="js/sample.js"></script>
 </head>
 
 <body>
     <div>
 
-        <h1>商品登録</h1>
-        <hr>
-        <!-- エラーメッセージ -->
-        <?php if (!empty($errormessage)) : ?>
-            <p style="color: red; font-size: 20px;"><?php echo $errormessage; ?></p>
+        <a>
+            <h1>在庫一覧</h1>
+        </a>
+        <?php if ($ok_code === 1) : ?>
+            <script>
+                alert('登録が完了しました')
+            </script>
+        <?php elseif ($ok_code === 2) : ?>
+            <script>
+                alert('商品が存在しません')
+            </script>
+        <?php endif; ?>
+        <?php unset($_SESSION['result']); ?>
+
+        <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
+            <p style="font-size: 20px; margin-right: 10%; text-align: right;">
+                <a href="ins_product.php">新規追加</a>
+                <a href="download.php">CSVダウンロード</a>
+            </p>
         <?php endif; ?>
 
+        <table align="center" border="3" style="font-size: 24px;">
 
-        <form action="" method="post">
-            <div style="font-size: 24px;">
-                <!-- 商品名 -->
-                <strong style="width: 200px;">商品名　　　　　</strong>
-                <input type="text" placeholder="商品名を入力して下さい" name="item_name" maxlength="255" value="<?php print(htmlspecialchars($_SESSION['item']['item_name'], ENT_QUOTES)); ?>" style="width: 500px">
+            <tr>
+                <th>NO.</th>
+                <th>商品名</th>
+                <th>価格</th>
+                <th>在庫数</th>
+                <th>入荷日</th>
 
-                <br><br>
-                <!-- 商品説明 -->
-                <strong style="width: 200px;">商品説明　　　　</strong>
-                <input type="text" placeholder="商品説明を入力して下さい" name="item_desc" maxlength="255" value="<?php print(htmlspecialchars($_SESSION['item']['item_desc'], ENT_QUOTES)); ?>" style="width: 500px">
+                <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
+                    <th>　</th>
+                <?php endif; ?>
+            </tr>
 
-                <br><br>
-                <!-- 仕入先 -->
-                <strong style="width: 200px;">仕入先　　　　　</strong>
-                <input type="text" placeholder="仕入先を入力して下さい" name="item_comp" maxlength="255" value="<?php print(htmlspecialchars($_SESSION['item']['item_comp'], ENT_QUOTES)); ?>" style="width: 500px">
-                <br><br>
-                <!-- 生産国 -->
-                <strong style="width: 200px;">生産国　　　　　</strong>
-                <input type="text" placeholder="生産国を入力して下さい" name="country" maxlength="255" value="<?php print(htmlspecialchars($_SESSION['item']['country'], ENT_QUOTES)); ?>" style="width: 500px">
 
-                <br><br>
-                <!-- 価格 -->
-                <strong style="width: 200px;">価格　　　　　　</strong>
-                <input type="text" placeholder="価格を入力して下さい" name="price" maxlength="255" value="<?php print(htmlspecialchars($_SESSION['item']['price'], ENT_QUOTES)); ?>" style="width: 500px">
+            <?php while ($item = $items->fetch()) : ?>
+                <tr>
+                    <td><?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($item['item_name'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($item['price'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($item['stock'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($item['day'], ENT_QUOTES)) ?></td>
 
-                <br><br>
-                <!-- 仕入れ価格 -->
-                <strong style="width: 200px;">仕入れ価格　　　</strong>
-                <input type="text" placeholder="仕入れ価格を入力して下さい" name="w_price" maxlength="255" value="<?php print(htmlspecialchars($_SESSION['item']['w_price'], ENT_QUOTES)); ?>" style="width: 500px">
 
-                <br><br>
-                <!-- 在庫数 -->
-                <strong style="width: 200px;">在庫数　　　　　</strong>
-                <input type="text" placeholder="在庫数を入力して下さい" name="stock" maxlength="255" value="<?php print(htmlspecialchars($_SESSION['item']['stock'], ENT_QUOTES)); ?>" style="width: 500px">
+                    <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
+                        <td style="text-align: center;">
 
-                <br><br>
-                <!-- 入荷日 -->
-                <strong style="width: 200px;">入荷日　　　　　</strong>
-                <input type="text" placeholder="入荷日を入力して下さい(年-月-日：yyyy-mm-dd)" name="day" maxlength="255" value="<?php print(htmlspecialchars($_SESSION['item']['day'], ENT_QUOTES)); ?>" style="width: 500px">
+                            <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>">編集</a>
+                            |<input type="hidden" name="item_id" class="item_id" value="<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>" />
+                            <a class="push" href="">削除</a>
 
-            </div>
+                        </td>
+                    <?php endif; ?>
+                </tr>
+            <?php endwhile; ?>
 
-            <br><br>
+            </p>
 
-            <div>
-                <!-- 登録ボタン -->
-                <input type="submit" value="登録" style="font-size: 30px; width: 150px; height: 50px;">
-            </div>
-        </form>
+
+        </table>
+        <br>
+
+        <p style="margin-right: 20%; text-align: right;">
+
+            <?php if ($page > 1) : ?>
+                <a href="stock.php?page=1">《</a>
+                <a href="stock.php?page=<?php print(htmlspecialchars(($page - 1), ENT_QUOTES)); ?>">〈</a>
+            <?php else : ?>
+                《〈
+            <?php endif; ?>
+
+            <?php for ($pagecut = 1; $pagecut <= $maxPage; $pagecut++) : ?>
+                <a href="stock.php?page=<?php print(htmlspecialchars(($pagecut), ENT_QUOTES)); ?>"><?php print(htmlspecialchars($pagecut, ENT_QUOTES)); ?></a>
+            <?php endfor; ?>
+
+            <?php if ($page < $maxPage) : ?>
+                <a href="stock.php?page=<?php print(htmlspecialchars(($page + 1), ENT_QUOTES)); ?>">〉</a>
+                <a href="stock.php?page=<?php print(htmlspecialchars($maxPage, ENT_QUOTES)); ?>">》</a>
+            <?php else : ?>
+                〉》
+            <?php endif; ?>
+        </p>
+
     </div>
-    <a href="stock.php">
-        <p style="margin-left: 20%; text-align: left;">≪ 戻る</p>
+    <a href="menu.php">
+        <p style="margin-left: 10%; text-align: left;">≪ 戻る</p>
     </a>
 </body>
 
