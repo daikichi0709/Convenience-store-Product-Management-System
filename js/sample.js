@@ -1,17 +1,17 @@
 $(function () {
     $('.push').click(function () {
         // 関数呼び出し
-        ajaxCall();
+        ajaxCall(this);
     });
 
 
-    function ajaxCall() {
+    function ajaxCall(target) {
         $.ajax({
             url: 'del_product.php',
             dateType: 'json',
             type: 'POST',
             data: {
-                'item_id': $('.item_id').val()
+                'item_id' : $(target).prev('.item_id').val()
             }
         }).done(function (data, status, jqXHR) {
             // コール成功の動作
