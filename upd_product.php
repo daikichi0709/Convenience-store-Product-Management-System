@@ -11,7 +11,7 @@ if (isset($_REQUEST['item_id']) && is_numeric($_REQUEST['item_id'])) {
     $item = $items->fetch();
 
     if (empty($item)) {
-        $_SESSION['login']['ok_code'] = 2; //不在フラグ
+        $_SESSION['result'] = 2; //不在フラグ
         header('Location: stock.php');
         exit();
     }
@@ -102,7 +102,7 @@ if (!empty($_POST)) {
 
         unset($_SESSION['item']);
         if (empty($_SESSION['item'])) {
-            $_SESSION['login']['ok_code'] = 1; //更新完了フラグ
+            $_SESSION['result'] = 1; //更新完了フラグ
             header('Location: stock.php');
             exit();
         }
