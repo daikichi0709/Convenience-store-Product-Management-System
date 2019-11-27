@@ -7,9 +7,9 @@ require('Common.php');
 header('Content-Type：application/json; charset=UTF-8');
 
 //仮にPOSTの値が何もなければ不正リクエストとして返金
-if(empty($_POST)){
-    $response[] = ['error' => '不正リクエストです','status' => 405];
-    echo  json_encode($response,JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+if (empty($_POST)) {
+    $response[] = ['error' => '不正リクエストです', 'status' => 405];
+    echo  json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit();
 }
 
@@ -25,8 +25,5 @@ $response  = [];
 
 // もらった値をそのままかえす
 $response[] = ['id' => $_POST['item_id']];
-echo  json_encode($response,JSON_UNESCAPED_SLASHES  | JSON_UNESCAPED_UNICODE);
-
-
+echo  json_encode($response, JSON_UNESCAPED_SLASHES  | JSON_UNESCAPED_UNICODE);
 exit();
-?>
