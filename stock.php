@@ -35,6 +35,7 @@ $auth = $login_userdata->fetch();
 
 ?>
 
+
 <!DOCTYPE html>
 <html>
 
@@ -58,6 +59,8 @@ $auth = $login_userdata->fetch();
             height: 40%;
         }
     </style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="js/sample.js"></script>
 </head>
 
 <body>
@@ -112,7 +115,8 @@ $auth = $login_userdata->fetch();
                         <td style="text-align: center;">
 
                             <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>">編集</a>
-                            |<a href="del_product.php?item_id=<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>" onclick="return confirm('本当に削除してよろしいですか？');">削除</a>
+                            |<input type="hidden" name="item_id" class="item_id" value="<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>" />
+                            <a href="" class="push">削除</a>
 
                         </td>
                     <?php endif; ?>
