@@ -84,8 +84,8 @@ $auth = $login_userdata->fetch();
             <p style="font-size: 20px; margin-right: 10%; text-align: right;">
                 <a href="ins_product.php">新規追加</a>
                 <a href="download.php">CSVダウンロード</a>
-            </p><?php endif; ?>
-
+            </p>
+        <?php endif; ?>
 
         <table align="center" border="3" style="font-size: 24px;">
 
@@ -116,7 +116,7 @@ $auth = $login_userdata->fetch();
 
                             <a href="upd_product.php?item_id=<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>">編集</a>
                             |<input type="hidden" name="item_id" class="item_id" value="<?php print(htmlspecialchars($item['item_id'], ENT_QUOTES)); ?>" />
-                            <a href="" class="push">削除</a>
+                            <a class="push" href="" >削除</a>
 
                         </td>
                     <?php endif; ?>
