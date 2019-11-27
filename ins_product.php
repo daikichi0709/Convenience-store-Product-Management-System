@@ -100,7 +100,7 @@ if (!empty($_POST)) {
 
         unset($_SESSION['item']);
         if (empty($_SESSION['item'])) {
-            $_SESSION['login']['ok_code'] = 1; //登録完了フラグ
+            $_SESSION['result'] = 1; //登録完了フラグ
             header('Location: stock.php');
             exit();
         }
