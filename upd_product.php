@@ -6,7 +6,7 @@ require('Common.php');
 if (isset($_REQUEST['item_id']) && is_numeric($_REQUEST['item_id'])) {
     $id = $_REQUEST['item_id'];
 
-    $items = $db->prepare('SELECT item_name, item_desc, item_comp, country, price, w_price, stock FROM t_inventories WHERE item_id=?');
+    $items = $db->prepare('SELECT item_name, item_desc, item_comp, country, price, w_price, stock FROM t_inventories WHERE item_id=? and del_flg <> 1');
     $items->execute(array($id));
     $item = $items->fetch();
 
