@@ -17,39 +17,41 @@ if (isset($_REQUEST['user_id']) && is_numeric($_REQUEST['user_id'])) {
     }
 }
 
+$errormessage  = '';
+$udeuser = [];
+
 if (!empty($_POST)) {
-    $_SESSION['user'] = $_POST;
-    $errormessage  = '';
+    $udeuser = $_POST;
 
     // ユーザー名
-    if (empty($_SESSION['user']['user_name'])) {
+    if (empty($udeuser['user_name'])) {
         $errormessage .= "ユーザー名が未入力です" . "<br>";
     } else {
-        if (mb_strlen($_SESSION['user']['user_name']) > 20) {
+        if (mb_strlen($udeuser['user_name']) > 20) {
             $errormessage .= "ユーザー名に入力できる文字数を超えています" . "<br>";
         }
     }
 
     // メールアドレス
-    if (empty($_SESSION['user']['email'])) {
+    if (empty($udeuser['email'])) {
         $errormessage .= "メールアドレスが未入力です" . "<br>";
     } else {
-        if (mb_strlen($_SESSION['user']['email']) > 255) {
+        if (mb_strlen($udeuser['email']) > 255) {
             $errormessage .= "メールアドレスに入力できる文字数を超えています" . "<br>";
         }
     }
 
     // パスワード
-    if (empty($_SESSION['user']['password'])) {
+    if (empty($udeuser['password'])) {
         $errormessage .= "パスワードが未入力です" . "<br>";
     } else {
-        if (mb_strlen($_SESSION['user']['password']) < 6 || mb_strlen($_SESSION['user']['password']) >= 16) {
+        if (mb_strlen($udeuser['password']) < 6 || mb_strlen($udeuser['password']) >= 16) {
             $errormessage .= "パスワードが6文字以上16文字未満にしてください" . "<br>";
         }
     }
 
     // 権限
-    if (empty($_SESSION['user']['auth'])) {
+    if (empty($udeuser['auth'])) {
         $errormessage .= "権限が未設定です<br>";
     }
 
@@ -57,29 +59,24 @@ if (!empty($_POST)) {
 
     // ユーザー編集処理
     if (empty($errormessage)) {
-        if ($_SESSION['user']['password'] === $_POST['protpassword']) {
+        if ($udeuser['password'] === $udeuser['protpassword']) {
             $statement = $db->prepare('UPDATE m_users SET user_name=?, email=?, password=?, auth=?, upd_date=?, upd_user_id=? WHERE user_id=?');
 
             //パスワードの暗号化
-            $hash_pass = password_hash($_SESSION['user']['password'], PASSWORD_DEFAULT);
+            $hash_pass = password_hash($udeuser['password'], PASSWORD_DEFAULT);
 
             //日時設定
             $today = new DateTime();
             $instime = $today->format('Y-m-d H:i:s');
 
-            $statement->execute(array($_SESSION['user']['user_name'], $_SESSION['user']['email'], $hash_pass,  $_SESSION['user']['auth'],  $instime,  $_SESSION['login']['user_id'], $id));
+            $statement->execute(array($udeuser['user_name'], $udeuser['email'], $hash_pass,  $udeuser['auth'],  $instime,  $_SESSION['login']['user_id'], $id));
 
-            unset($_SESSION['user']);
-            if (empty($_SESSION['user'])) {
-                $_SESSION['login']['ok_code'] = 1; //更新完了フラグ
-                header('Location: users.php');
-                exit();
-            }
+            $_SESSION['login']['ok_code'] = 1; //更新完了フラグ
+            header('Location: users.php');
+            exit();
         }
         $errormessage .= "パスワードが一致しません<br>";
     }
-} else {
-    unset($_SESSION['user']);
 }
 ?>
 
@@ -112,7 +109,7 @@ if (!empty($_POST)) {
     <div style="font-size: 24px">
         <h1>ユーザー編集</h1>
         <hr>
-        <?php echo $_SESSION['user']['user_id']; ?>
+        <?php echo $udeuser['user_id']; ?>
         <!-- エラーメッセージ -->
         <?php if (!empty($errormessage)) : ?>
             <p style="color: red; font-size: 20px;"><?php echo $errormessage; ?></p>
@@ -122,30 +119,28 @@ if (!empty($_POST)) {
             <div style="font-size: 24px">
                 <!-- ユーザー名 -->
                 <strong style="width: 200px;">ユーザー名　　　　　　</strong>
-                <input type="text" placeholder="ユーザー名を入力してください" name="user_name" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['user'])) {
+                <input type="text" placeholder="ユーザー名を入力してください" name="user_name" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_POST)) {
                                                                                                                                                     print(htmlspecialchars($user['user_name'], ENT_QUOTES));
                                                                                                                                                 } else {
-                                                                                                                                                    print(htmlspecialchars($_SESSION['user']['user_name'], ENT_QUOTES));
+                                                                                                                                                    print(htmlspecialchars($_POST['user_name'], ENT_QUOTES));
                                                                                                                                                 }
                                                                                                                                                 ?>">
 
                 <br><br>
                 <!-- メールアドレス -->
                 <strong style="width: 200px;">メールアドレス　　　　</strong>
-                <input type="text" placeholder="メールアドレスを入力してください" name="email" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['user'])) {
+                <input type="text" placeholder="メールアドレスを入力してください" name="email" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_POST)) {
                                                                                                                                                 print(htmlspecialchars($user['email'], ENT_QUOTES));
                                                                                                                                             } else {
-                                                                                                                                                print(htmlspecialchars($_SESSION['user']['email'], ENT_QUOTES));
+                                                                                                                                                print(htmlspecialchars($_POST['email'], ENT_QUOTES));
                                                                                                                                             }
                                                                                                                                             ?>">
 
                 <br><br>
                 <!-- パスワード -->
                 <strong style="width: 200px;">パスワード　　　　　　</strong>
-                <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['user'])) {
-                                                                                                                                                    print(htmlspecialchars($user['password'], ENT_QUOTES));
-                                                                                                                                                } else {
-                                                                                                                                                    print(htmlspecialchars($_SESSION['user']['password'], ENT_QUOTES));
+                <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (!empty($_POST)) {
+                                                                                                                                                    print(htmlspecialchars($_POST['password'], ENT_QUOTES));
                                                                                                                                                 }
                                                                                                                                                 ?>">
 
@@ -157,10 +152,10 @@ if (!empty($_POST)) {
                 <br><br>
                 <!-- 権限 -->
                 <strong style="width: 200px;">権限　　　　　　　　　</strong>
-                <input type="text" placeholder="権限を数値で決めて下さい【1:管理者,2:発注担当者,3:閲覧者】" name="auth" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_SESSION['user'])) {
+                <input type="text" placeholder="権限を数値で決めて下さい【1:管理者,2:発注担当者,3:閲覧者】" name="auth" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_POST)) {
                                                                                                                                                                 print(htmlspecialchars($user['auth'], ENT_QUOTES));
                                                                                                                                                             } else {
-                                                                                                                                                                print(htmlspecialchars($_SESSION['user']['auth'], ENT_QUOTES));
+                                                                                                                                                                print(htmlspecialchars($_POST['auth'], ENT_QUOTES));
                                                                                                                                                             }
                                                                                                                                                             ?>">
 
