@@ -58,7 +58,7 @@ if (!empty($_POST)) {
 
 
 
-            $_SESSION['login']['ok_code'] = 1; //更新完了フラグ
+            $_SESSION['result'] = 1; //更新完了フラグ
             header('Location: users.php');
             exit();
         }
