@@ -11,7 +11,7 @@ if (isset($_REQUEST['user_id']) && is_numeric($_REQUEST['user_id'])) {
     $user = $users->fetch();
 
     if (empty($user)) {
-        $_SESSION['login']['ok_code'] = 2; //ユーザー不在フラグ
+        $_SESSION['result'] = 2; //ユーザー不在フラグ
         header('Location: users.php');
         exit();
     }
@@ -71,7 +71,7 @@ if (!empty($_POST)) {
 
             $statement->execute(array($udeuser['user_name'], $udeuser['email'], $hash_pass,  $udeuser['auth'],  $instime,  $_SESSION['login']['user_id'], $id));
 
-            $_SESSION['login']['ok_code'] = 1; //更新完了フラグ
+            $_SESSION['result'] = 1; //更新完了フラグ
             header('Location: users.php');
             exit();
         }
