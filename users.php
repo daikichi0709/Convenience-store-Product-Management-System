@@ -112,9 +112,9 @@ $users->execute();
 
                         <td><a href="upd_users.php?user_id=<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>">編集</a>
                             |<input type="hidden" name="user_id" class="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>" />
-                            <a class="push1" href="">削除</a>
+                            <a class="delete"" href="">削除</a>
                             |<input type="hidden" name="user_id" class="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>" />
-                            <a class="push2" href=""><?php if ($user['lock_flg'] === '0') : ?>ロック<?php elseif ($user['lock_flg'] === '1' || $user['lock_flg'] === '9') : ?>ロック解除<?php endif; ?></a>
+                            <a class="lock" href=""><?php if ($user['lock_flg'] === '0') : ?>ロック<?php elseif ($user['lock_flg'] === '1' || $user['lock_flg'] === '9') : ?>ロック解除<?php endif; ?></a>
                             </a>
                         </td>
                     </tr>
