@@ -37,8 +37,10 @@ if (!empty($_POST)) {
     }
 
     // 権限
-    if (empty($join['auth'])) {
+    if (empty($udeuser['auth'])) {
         $errormessage .= "権限が未設定です<br>";
+    } elseif ($udeuser['auth'] !== "1" || $udeuser['auth'] !== "2" || $udeuser['auth'] !== "3") {
+        $errormessage .= "権限が設定外です<br>";
     }
 
 
@@ -94,7 +96,6 @@ if (!empty($_POST)) {
 <body>
     <div>
         <h1>ユーザー登録</h1>
-
         <hr>
         <?php echo $udeuser['user_id']; ?>
         <!-- エラーメッセージ -->
@@ -136,11 +137,12 @@ if (!empty($_POST)) {
                 <br><br>
                 <!-- 権限 -->
                 <strong style="width: 200px;">権限　　　　　　　　　</strong>
-                <input type="text" placeholder="権限を数値で決めて下さい【1:管理者,2:発注担当者,3:閲覧者】" name="auth" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (!empty($_POST)) {
-                                                                                                                                                                print(htmlspecialchars($_POST['auth'], ENT_QUOTES));
-                                                                                                                                                            }
-                                                                                                                                                            ?>">
-
+                <select name="auth" style="font-size: 18px; width: 500px;">
+                    <option value="">選択</option>
+                    <option value="1">管理者</option>
+                    <option value="2">発注担当者</option>
+                    <option value="3">閲覧者</option>
+                </select>
             </div>
 
             <br><br>
@@ -150,7 +152,6 @@ if (!empty($_POST)) {
             </div>
         </form>
     </div>
-
     <a href="users.php">
         <p style="margin-left: 20%; text-align: left;">≪ 戻る</p>
     </a>
