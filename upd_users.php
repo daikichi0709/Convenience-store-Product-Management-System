@@ -48,6 +48,9 @@ if (!empty($_POST)) {
         if (mb_strlen($udeuser['password']) < 6 || mb_strlen($udeuser['password']) >= 16) {
             $errormessage .= "パスワードが6文字以上16文字未満にしてください" . "<br>";
         }
+        if ($udeuser['password'] !== $udeuser['protpassword']) {
+            $errormessage .= "パスワードが一致しません<br>";
+        }
     }
 
     // 権限
@@ -59,23 +62,20 @@ if (!empty($_POST)) {
 
     // ユーザー編集処理
     if (empty($errormessage)) {
-        if ($udeuser['password'] === $udeuser['protpassword']) {
-            $statement = $db->prepare('UPDATE m_users SET user_name=?, email=?, password=?, auth=?, upd_date=?, upd_user_id=? WHERE user_id=?');
+        $statement = $db->prepare('UPDATE m_users SET user_name=?, email=?, password=?, auth=?, upd_date=?, upd_user_id=? WHERE user_id=?');
 
-            //パスワードの暗号化
-            $hash_pass = password_hash($udeuser['password'], PASSWORD_DEFAULT);
+        //パスワードの暗号化
+        $hash_pass = password_hash($udeuser['password'], PASSWORD_DEFAULT);
 
-            //日時設定
-            $today = new DateTime();
-            $instime = $today->format('Y-m-d H:i:s');
+        //日時設定
+        $today = new DateTime();
+        $instime = $today->format('Y-m-d H:i:s');
 
-            $statement->execute(array($udeuser['user_name'], $udeuser['email'], $hash_pass,  $udeuser['auth'],  $instime,  $_SESSION['login']['user_id'], $id));
+        $statement->execute(array($udeuser['user_name'], $udeuser['email'], $hash_pass,  $udeuser['auth'],  $instime,  $_SESSION['login']['user_id'], $id));
 
-            $_SESSION['result'] = 1; //更新完了フラグ
-            header('Location: users.php');
-            exit();
-        }
-        $errormessage .= "パスワードが一致しません<br>";
+        $_SESSION['result'] = 1; //更新完了フラグ
+        header('Location: users.php');
+        exit();
     }
 }
 ?>
@@ -109,7 +109,6 @@ if (!empty($_POST)) {
     <div style="font-size: 24px">
         <h1>ユーザー編集</h1>
         <hr>
-        <?php echo $udeuser['user_id']; ?>
         <!-- エラーメッセージ -->
         <?php if (!empty($errormessage)) : ?>
             <p style="color: red; font-size: 20px;"><?php echo $errormessage; ?></p>
@@ -119,7 +118,7 @@ if (!empty($_POST)) {
             <div style="font-size: 24px">
                 <!-- ユーザー名 -->
                 <strong style="width: 200px;">ユーザー名　　　　　　</strong>
-                <input type="text" placeholder="ユーザー名を入力してください" name="user_name" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_POST)) {
+                <input type="text" placeholder="ユーザー名を入力してください" name="user_name" maxlength="255" style="font-size: 18px; width: 500px;" value="<?php if (empty($_POST)) {
                                                                                                                                                     print(htmlspecialchars($user['user_name'], ENT_QUOTES));
                                                                                                                                                 } else {
                                                                                                                                                     print(htmlspecialchars($_POST['user_name'], ENT_QUOTES));
@@ -129,35 +128,32 @@ if (!empty($_POST)) {
                 <br><br>
                 <!-- メールアドレス -->
                 <strong style="width: 200px;">メールアドレス　　　　</strong>
-                <input type="text" placeholder="メールアドレスを入力してください" name="email" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_POST)) {
-                                                                                                                                                print(htmlspecialchars($user['email'], ENT_QUOTES));
-                                                                                                                                            } else {
-                                                                                                                                                print(htmlspecialchars($_POST['email'], ENT_QUOTES));
-                                                                                                                                            }
-                                                                                                                                            ?>">
-
-                <br><br>
-                <!-- パスワード -->
-                <strong style="width: 200px;">パスワード　　　　　　</strong>
-                <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (!empty($_POST)) {
-                                                                                                                                                    print(htmlspecialchars($_POST['password'], ENT_QUOTES));
+                <input type="text" placeholder="メールアドレスを入力してください" name="email" maxlength="255" style="font-size: 18px; width: 500px;" value="<?php if (empty($_POST)) {
+                                                                                                                                                    print(htmlspecialchars($user['email'], ENT_QUOTES));
+                                                                                                                                                } else {
+                                                                                                                                                    print(htmlspecialchars($_POST['email'], ENT_QUOTES));
                                                                                                                                                 }
                                                                                                                                                 ?>">
 
                 <br><br>
+                <!-- パスワード -->
+                <strong style="width: 200px;">パスワード　　　　　　</strong>
+                <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px;">
+
+                <br><br>
                 <!-- パスワード（確認） -->
                 <strong style="width: 200px;">パスワード（確認）　　</strong>
-                <input type="text" placeholder="確認のため設定したパスワードを入力してください" name="protpassword" maxlength="255" style="font-size: 18px; width: 500px">
+                <input type="text" placeholder="確認のため設定したパスワードを入力してください" name="protpassword" maxlength="255" style="font-size: 18px; width: 500px;">
 
                 <br><br>
                 <!-- 権限 -->
                 <strong style="width: 200px;">権限　　　　　　　　　</strong>
-                <input type="text" placeholder="権限を数値で決めて下さい【1:管理者,2:発注担当者,3:閲覧者】" name="auth" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (empty($_POST)) {
-                                                                                                                                                                print(htmlspecialchars($user['auth'], ENT_QUOTES));
-                                                                                                                                                            } else {
-                                                                                                                                                                print(htmlspecialchars($_POST['auth'], ENT_QUOTES));
-                                                                                                                                                            }
-                                                                                                                                                            ?>">
+                <select name="auth" style="font-size: 18px; width: 500px;">
+                    <option value="0">権限を数値で決めて下さい</option>
+                    <option value="1">管理者</option>
+                    <option value="2">発注担当者</option>
+                    <option value="3">閲覧者</option>
+                </select>
 
             </div>
 
