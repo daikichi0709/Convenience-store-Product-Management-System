@@ -1,10 +1,10 @@
 $(function () {
     $('.delete').click(function () {
         // 関数呼び出し
-        deleAjaxCall(this);
+        delAjaxCall(this);
     });
 
-    function deleAjaxCall(target) {
+    function delAjaxCall(target) {
         $.ajax({
             url: 'del_users.php',
             dateType: 'json',
@@ -25,10 +25,10 @@ $(function () {
 
     $('.lock').click(function () {
         // 関数呼び出し
-        lockAjaxCall(this);
+        locAjaxCall(this);
     });
 
-    function lockAjaxCall(target) {
+    function locAjaxCall(target) {
         $.ajax({
             url: 'lockswitch.php',
             dateType: 'json',
