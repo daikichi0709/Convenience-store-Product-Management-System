@@ -1,10 +1,10 @@
 $(function () {
-    $('.push1').click(function () {
+    $('.delete').click(function () {
         // 関数呼び出し
-        ajaxCall1(this);
+        deleAjaxCall1(this);
     });
 
-    function ajaxCall1(target) {
+    function deleAjaxCall1(target) {
         $.ajax({
             url: 'del_users.php',
             dateType: 'json',
@@ -23,12 +23,12 @@ $(function () {
         });
     }
 
-    $('.push2').click(function () {
+    $('.lock').click(function () {
         // 関数呼び出し
-        ajaxCall2(this);
+        lockAjaxCall2(this);
     });
 
-    function ajaxCall2(target) {
+    function lockAjaxCall2(target) {
         $.ajax({
             url: 'lockswitch.php',
             dateType: 'json',
