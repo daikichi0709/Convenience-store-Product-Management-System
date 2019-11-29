@@ -3,12 +3,12 @@ session_start();
 // DB接続
 require('Common.php');
 
+$ok_code = $_SESSION['result'];
+
 $keyid = $_SESSION['login']['user_id'];
 $login_userdata = $db->prepare('SELECT auth FROM m_users WHERE user_id=?');
 $login_userdata->execute(array($keyid));
 $auth = $login_userdata->fetch();
-
-$ok_code = $_SESSION['login']['ok_code'];
 
 $page = $_REQUEST['page'];
 
@@ -58,7 +58,6 @@ $users->execute();
     </style>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="js/usersamp.js"></script>
-    <script type="text/javascript" src="js/lockswitch.js"></script>
 </head>
 
 <body>
@@ -84,7 +83,7 @@ $users->execute();
                     alert('ユーザーが存在しません')
                 </script>
             <?php endif; ?>
-            <?php $_SESSION['login']['ok_code'] = 0; ?>
+            <?php unset($_SESSION['result']); ?>
 
             <p style="font-size: 20px; margin-right: 15%; text-align: right;">
                 <a href="ins_users.php">新規追加</a>
