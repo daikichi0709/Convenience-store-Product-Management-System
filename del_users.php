@@ -6,7 +6,7 @@ require('Common.php');
 // JSONにする
 header('Content-Type：application/json; charset=UTF-8');
 
-//仮にPOSTの値が何もなければ不正リクエストとして返金
+//仮にPOSTの値が何もなければ不正リクエストとして返す
 if (empty($_POST)) {
     $response[] = ['error' => '不正リクエストです', 'status' => 405];
     echo  json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
