@@ -6,7 +6,7 @@ require('Common.php');
 if (isset($_REQUEST['user_id']) && is_numeric($_REQUEST['user_id'])) {
     $id = $_REQUEST['user_id'];
 
-    $users = $db->prepare('SELECT user_name, email, password, auth FROM m_users WHERE user_id=?');
+    $users = $db->prepare('SELECT user_id, user_name, email, password, auth FROM m_users WHERE user_id=?');
     $users->execute(array($id));
     $user = $users->fetch();
 
@@ -14,6 +14,12 @@ if (isset($_REQUEST['user_id']) && is_numeric($_REQUEST['user_id'])) {
         $_SESSION['result'] = 2; //ユーザー不在フラグ
         header('Location: users.php');
         exit();
+    }
+
+    //権限制御
+    $authcontrol = "";
+    if ($user['user_id'] === $_SESSION['login']['user_id']) {
+        $authcontrol = 1;
     }
 }
 
@@ -53,13 +59,14 @@ if (!empty($_POST)) {
         }
     }
 
-    // 権限
-    if (empty($udeuser['auth'])) {
-        $errormessage .= "権限が未設定です<br>";
-    } elseif ($udeuser['auth'] < 1 && $udeuser['auth'] > 3) {
-        $errormessage .= "権限が設定外です<br>";
+    // 権限{{
+    if ($authcontrol !== 1) {
+        if (empty($udeuser['auth'])) {
+            $errormessage .= "権限が未設定です<br>";
+        } elseif ($udeuser['auth'] !== "1" || $udeuser['auth'] !== "2" || $udeuser['auth'] !== "3") {
+            $errormessage .= "権限が設定外です<br>";
+        }
     }
-
 
 
     // ユーザー編集処理
@@ -148,15 +155,16 @@ if (!empty($_POST)) {
                 <input type="text" placeholder="確認のため設定したパスワードを入力してください" name="protpassword" maxlength="255" style="font-size: 18px; width: 500px;">
 
                 <br><br>
-                <!-- 権限 -->
-                <strong style="width: 200px;">権限　　　　　　　　　</strong>
-                <select name="auth" style="font-size: 18px; width: 500px;">
-                    <option value="">選択</option>
-                    <option value="1">管理者</option>
-                    <option value="2">発注担当者</option>
-                    <option value="3">閲覧者</option>
-                </select>
-
+                <?php if ($authcontrol !== 1) : ?>
+                    <!-- 権限 -->
+                    <strong style="width: 200px;">権限　　　　　　　　　</strong>
+                    <select name="auth" style="font-size: 18px; width: 500px;">
+                        <option value="">選択</option>
+                        <option value="1">管理者</option>
+                        <option value="2">発注担当者</option>
+                        <option value="3">閲覧者</option>
+                    </select>
+                <?php endif; ?>
             </div>
 
             <br><br>
