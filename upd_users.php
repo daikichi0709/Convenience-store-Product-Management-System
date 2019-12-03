@@ -5,7 +5,6 @@ require('Common.php');
 
 if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
     $id = $_POST['user_id'];
-
     $users = $db->prepare('SELECT user_id, user_name, email, password, auth FROM m_users WHERE user_id=?');
     $users->execute(array($id));
     $user = $users->fetch();
@@ -15,20 +14,18 @@ if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
         header('Location: users.php');
         exit();
     }
-
-    //権限制御
-    $authcontrol = "";
-    if ($user['user_id'] === $_SESSION['login']['user_id']) {
-        $authcontrol = 1;
-    }
+}
+//権限制御
+$authcontrol = "";
+if (($user['user_id'] or $upduser['userid']) === $_SESSION['login']['user_id']) {
+    $authcontrol = 1;
 }
 
 $errormessage  = '';
 $upduser = [];
 
-if (!empty($_POST)) {
+if (!empty($_POST) && empty($id)) {
     $upduser = $_POST;
-
     // ユーザー名
     if (empty($upduser['user_name'])) {
         $errormessage .= "ユーザー名が未入力です" . "<br>";
@@ -60,7 +57,7 @@ if (!empty($_POST)) {
     }
 
     // 権限
-    if ($authcontrol !== 1) {
+    if ($authcontrol !== "1") {
         if (empty($upduser['auth'])) {
             $errormessage .= "権限が未設定です<br>";
         } elseif ($upduser['auth'] !== '1' && $upduser['auth'] !== '2' && $upduser['auth'] !== '3') {
@@ -80,13 +77,14 @@ if (!empty($_POST)) {
 
         $statement = $db->prepare('UPDATE m_users SET user_name=?, email=?, password=?, auth=?, upd_date=?, upd_user_id=? WHERE user_id=?');
 
-        $statement->execute(array($upduser['user_name'], $upduser['email'], $hash_pass, $upduser['auth'],  $updtime,  $_SESSION['login']['user_id'], $user['user_id']));
+        $statement->execute(array($upduser['user_name'], $upduser['email'], $hash_pass, $upduser['auth'],  $updtime,  $_SESSION['login']['user_id'], $upduser['userid']));
 
         $_SESSION['result'] = 1; //更新完了フラグ
         header('Location: users.php');
         exit();
     }
 }
+
 ?>
 
 
@@ -133,7 +131,12 @@ if (!empty($_POST)) {
         <?php endif; ?>
 
         <form method="post">
-            <input type="hidden" name="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>">
+            <input type="hidden" name="userid" value="<?php if (empty($_POST['userid'])) {
+                                                            print(htmlspecialchars($user['user_id'], ENT_QUOTES));
+                                                        } else {
+                                                            print(htmlspecialchars($_POST['userid'], ENT_QUOTES));
+                                                        }
+                                                        ?>">
             <div style="font-size: 24px">
                 <!-- ユーザー名 -->
                 <strong style="width: 200px;">ユーザー名　　　　　　</strong>
