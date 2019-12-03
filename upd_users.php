@@ -17,7 +17,7 @@ if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
 }
 //権限制御
 $authcontrol = "";
-if (($user['user_id'] or $upduser['userid']) === $_SESSION['login']['user_id']) {
+if ($user['user_id'] === $_SESSION['login']['user_id'] || $_POST['userid'] === $_SESSION['login']['user_id']) {
     $authcontrol = 1;
 }
 
@@ -57,7 +57,7 @@ if (!empty($_POST) && empty($id)) {
     }
 
     // 権限
-    if ($authcontrol !== "1") {
+    if ($authcontrol !== 1) {
         if (empty($upduser['auth'])) {
             $errormessage .= "権限が未設定です<br>";
         } elseif ($upduser['auth'] !== '1' && $upduser['auth'] !== '2' && $upduser['auth'] !== '3') {
@@ -84,6 +84,7 @@ if (!empty($_POST) && empty($id)) {
         exit();
     }
 }
+
 ?>
 
 
