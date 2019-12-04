@@ -2,9 +2,8 @@
 session_start();
 // DB接続
 require('Common.php');
-
-if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
-    $id = $_POST['user_id'];
+if (isset($_GET['user_id']) && is_numeric($_GET['user_id'])) {
+    $id = $_GET['user_id'];
     $users = $db->prepare('SELECT user_id, user_name, email, password, auth FROM m_users WHERE user_id=?');
     $users->execute(array($id));
     $user = $users->fetch();
@@ -24,7 +23,7 @@ if ($user['user_id'] === $_SESSION['login']['user_id'] || $_POST['userid'] === $
 $errormessage  = '';
 $upduser = [];
 
-if (!empty($_POST) && empty($id)) {
+if (!empty($_POST)) {
     $upduser = $_POST;
     // ユーザー名
     if (empty($upduser['user_name'])) {
@@ -103,7 +102,21 @@ if (!empty($_POST) && empty($id)) {
             height: 100;
             text-align: center;
             margin-top: 3%;
-            /* background-image: url("レトロ.jpg"); */
+            background-image: url("ラベンダー.jpg");
+        }
+
+        h1 {
+            margin-left: 40%;
+            width: 300px;
+            background-color: #ffff52;
+        }
+
+        p {
+            background-color: white;
+            color: red;
+            margin-left: 35%;
+            margin-right: 35%;
+            font-size: 20px;
         }
 
         h3 {
@@ -115,8 +128,10 @@ if (!empty($_POST) && empty($id)) {
         }
 
         table {
-            width: 80%;
-            height: 40%;
+            margin-left: 20%;
+            background-color: whitesmoke;
+            width: 60%;
+            height: 50%;
         }
     </style>
 </head>
@@ -127,71 +142,77 @@ if (!empty($_POST) && empty($id)) {
         <hr>
         <!-- エラーメッセージ -->
         <?php if (!empty($errormessage)) : ?>
-            <p style="color: red; font-size: 20px;"><?php echo $errormessage; ?></p>
+            <p><?php echo $errormessage; ?></p>
         <?php endif; ?>
+        <table>
+            <br>
+            <tr>
+                <td>
+                    <form method="post" action="">
+                        <input type="hidden" name="userid" value="<?php if (empty($_POST['userid'])) {
+                                                                        print(htmlspecialchars($user['user_id'], ENT_QUOTES));
+                                                                    } else {
+                                                                        print(htmlspecialchars($_POST['userid'], ENT_QUOTES));
+                                                                    }
+                                                                    ?>">
+                        <div style="font-size: 24px">
+                            <!-- ユーザー名 -->
+                            <strong style="width: 200px;">ユーザー名　　　　　　</strong>
+                            <input type="text" placeholder="ユーザー名を入力してください" name="user_name" maxlength="255" style="font-size: 18px; width: 500px;" value="<?php if (empty($_POST['user_name'])) {
+                                                                                                                                                                print(htmlspecialchars($user['user_name'], ENT_QUOTES));
+                                                                                                                                                            } else {
+                                                                                                                                                                print(htmlspecialchars($_POST['user_name'], ENT_QUOTES));
+                                                                                                                                                            }
+                                                                                                                                                            ?>">
 
-        <form method="post">
-            <input type="hidden" name="userid" value="<?php if (empty($_POST['userid'])) {
-                                                            print(htmlspecialchars($user['user_id'], ENT_QUOTES));
-                                                        } else {
-                                                            print(htmlspecialchars($_POST['userid'], ENT_QUOTES));
-                                                        }
-                                                        ?>">
-            <div style="font-size: 24px">
-                <!-- ユーザー名 -->
-                <strong style="width: 200px;">ユーザー名　　　　　　</strong>
-                <input type="text" placeholder="ユーザー名を入力してください" name="user_name" maxlength="255" style="font-size: 18px; width: 500px;" value="<?php if (empty($_POST['user_name'])) {
-                                                                                                                                                    print(htmlspecialchars($user['user_name'], ENT_QUOTES));
-                                                                                                                                                } else {
-                                                                                                                                                    print(htmlspecialchars($_POST['user_name'], ENT_QUOTES));
-                                                                                                                                                }
-                                                                                                                                                ?>">
+                            <br><br>
+                            <!-- メールアドレス -->
+                            <strong style="width: 200px;">メールアドレス　　　　</strong>
+                            <input type="text" placeholder="メールアドレスを入力してください" name="email" maxlength="255" style="font-size: 18px; width: 500px;" value="<?php if (empty($_POST['email'])) {
+                                                                                                                                                                print(htmlspecialchars($user['email'], ENT_QUOTES));
+                                                                                                                                                            } else {
+                                                                                                                                                                print(htmlspecialchars($_POST['email'], ENT_QUOTES));
+                                                                                                                                                            }
+                                                                                                                                                            ?>">
 
-                <br><br>
-                <!-- メールアドレス -->
-                <strong style="width: 200px;">メールアドレス　　　　</strong>
-                <input type="text" placeholder="メールアドレスを入力してください" name="email" maxlength="255" style="font-size: 18px; width: 500px;" value="<?php if (empty($_POST['email'])) {
-                                                                                                                                                    print(htmlspecialchars($user['email'], ENT_QUOTES));
-                                                                                                                                                } else {
-                                                                                                                                                    print(htmlspecialchars($_POST['email'], ENT_QUOTES));
-                                                                                                                                                }
-                                                                                                                                                ?>">
+                            <br><br>
+                            <!-- パスワード -->
+                            <strong style="width: 200px;">パスワード　　　　　　</strong>
+                            <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px;">
 
-                <br><br>
-                <!-- パスワード -->
-                <strong style="width: 200px;">パスワード　　　　　　</strong>
-                <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px;">
+                            <br><br>
+                            <!-- パスワード（確認） -->
+                            <strong style="width: 200px;">パスワード（確認）　　</strong>
+                            <input type="text" placeholder="確認のため設定したパスワードを入力してください" name="protpassword" maxlength="255" style="font-size: 18px; width: 500px;">
 
-                <br><br>
-                <!-- パスワード（確認） -->
-                <strong style="width: 200px;">パスワード（確認）　　</strong>
-                <input type="text" placeholder="確認のため設定したパスワードを入力してください" name="protpassword" maxlength="255" style="font-size: 18px; width: 500px;">
+                            <br><br>
+                            <?php if ($authcontrol !== 1) : ?>
+                                <!-- 権限 -->
+                                <strong style="width: 200px;">権限　　　　　　　　　</strong>
+                                <select name="auth" style="font-size: 18px; width: 500px;">
+                                    <option value="">選択</option>
+                                    <option value=1>管理者</option>
+                                    <option value=2>発注担当者</option>
+                                    <option value=3>閲覧者</option>
+                                </select>
+                            <?php elseif ($authcontrol === 1) : ?>
+                                <input type="hidden" name="auth" value=1 style="font-size: 18px; width: 500px;">
+                            <?php endif; ?>
+                        </div>
 
-                <br><br>
-                <?php if ($authcontrol !== 1) : ?>
-                    <!-- 権限 -->
-                    <strong style="width: 200px;">権限　　　　　　　　　</strong>
-                    <select name="auth" style="font-size: 18px; width: 500px;">
-                        <option value="">選択</option>
-                        <option value=1>管理者</option>
-                        <option value=2>発注担当者</option>
-                        <option value=3>閲覧者</option>
-                    </select>
-                <?php elseif ($authcontrol === 1) : ?>
-                    <input type="hidden" name="auth" value=1 style="font-size: 18px; width: 500px;">
-                <?php endif; ?>
-            </div>
+                        <br><br>
 
-            <br><br>
-
-            <div>
-                <!-- 登録ボタン -->
-                <input type="submit" value="更新" style="font-size: 30px; width: 150px; height: 50px;">
-            </div>
-        </form>
+                        <div>
+                            <!-- 登録ボタン -->
+                            <input type="submit" value="更新" style="font-size: 30px; width: 150px; height: 50px;">
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        </table>
     </div>
     <a href="users.php">
-        <p style="margin-left: 20%; text-align: left;">≪ 戻る</p>
+        <p style="background-color:whitesmoke; margin-left: 20%; text-align: left; font-size: 18px; width: 80px;">≪ 戻る</p>
     </a>
 </body>
 
