@@ -17,7 +17,7 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id'])) {
 //権限制御
 $authcontrol = "";
 if ($user['user_id'] === $_SESSION['login']['user_id'] || $_POST['userid'] === $_SESSION['login']['user_id']) {
-    $authcontrol = 1;
+    $authcontrol = $user['auth'];
 }
 
 $errormessage  = '';
@@ -56,10 +56,16 @@ if (!empty($_POST)) {
     }
 
     // 権限
-    if ($authcontrol !== 1) {
+    if ($authcontrol === "1") {
         if (empty($upduser['auth'])) {
             $errormessage .= "権限が未設定です<br>";
-        } elseif ($upduser['auth'] !== '1' && $upduser['auth'] !== '2' && $upduser['auth'] !== '3') {
+        } elseif ($upduser['auth'] !== $authcontrol) {
+            $errormessage .= "管理者権限ではありません<br>";
+        }
+    } else {
+        if (empty($upduser['auth'])) {
+            $errormessage .= "権限が未設定です<br>";
+        } elseif ($upduser['auth'] !== "1" && $upduser['auth'] !== "2" && $upduser['auth'] !== "3") {
             $errormessage .= "権限が設定外です<br>";
         }
     }
@@ -132,6 +138,7 @@ if (!empty($_POST)) {
             background-color: whitesmoke;
             width: 60%;
             height: 50%;
+            text-align: center;
         }
     </style>
 </head>
@@ -186,7 +193,7 @@ if (!empty($_POST)) {
                             <input type="text" placeholder="確認のため設定したパスワードを入力してください" name="protpassword" maxlength="255" style="font-size: 18px; width: 500px;">
 
                             <br><br>
-                            <?php if ($authcontrol !== 1) : ?>
+                            <?php if ($authcontrol !== "1") : ?>
                                 <!-- 権限 -->
                                 <strong style="width: 200px;">権限　　　　　　　　　</strong>
                                 <select name="auth" style="font-size: 18px; width: 500px;">
@@ -195,8 +202,8 @@ if (!empty($_POST)) {
                                     <option value=2>発注担当者</option>
                                     <option value=3>閲覧者</option>
                                 </select>
-                            <?php elseif ($authcontrol === 1) : ?>
-                                <input type="hidden" name="auth" value=1 style="font-size: 18px; width: 500px;">
+                            <?php elseif ($authcontrol === "1") : ?>
+                                <input type="hidden" name="auth" value=<?php print(htmlspecialchars($user['auth'], ENT_QUOTES)); ?>>
                             <?php endif; ?>
                         </div>
 
@@ -212,7 +219,7 @@ if (!empty($_POST)) {
         </table>
     </div>
     <a href="users.php">
-        <p style="background-color:whitesmoke; margin-left: 20%; text-align: left; font-size: 18px; width: 80px;">≪ 戻る</p>
+        <p style="background-color:whitesmoke; margin-left: 20%; text-align: left; font-size: 18px; width: 75px;">≪ 戻る</p>
     </a>
 </body>
 
