@@ -55,17 +55,23 @@ if (!empty($_POST)) {
         }
     }
 
+
+    //ユーザーの一覧情報の取得
+    $spval = $db->prepare('SELECT auth_name FROM m_auth WHERE auth=?');
+    $spval->execute(array($upduser['auth']));
+    $authname = $spval->fetch();
+
     // 権限
     if ($authcontrol === "1") {
-        if (empty($upduser['auth'])) {
+        if (empty($spval)) {
             $errormessage .= "権限が未設定です<br>";
-        } elseif ($upduser['auth'] !== $authcontrol) {
+        } elseif ($authname['auth_name'] !== '管理者') {
             $errormessage .= "管理者権限ではありません<br>";
         }
     } else {
-        if (empty($upduser['auth'])) {
+        if (empty($spval)) {
             $errormessage .= "権限が未設定です<br>";
-        } elseif ($upduser['auth'] !== "1" && $upduser['auth'] !== "2" && $upduser['auth'] !== "3") {
+        } elseif ($authname['auth_name'] !== '管理者' && $authname['auth_name'] !== '発注担当者' && $authname['auth_name'] !== '閲覧者') {
             $errormessage .= "権限が設定外です<br>";
         }
     }
