@@ -27,8 +27,8 @@ $page = min($page, $maxPage);
 //出力ページで出す項目の一番上の番号の計算式
 $start = ($page - 1) * 10;
 
-//削除フラグが「1」のモノは取得しない
-$users = $db->prepare('SELECT user_id, user_name, email, auth, lock_flg FROM m_users WHERE del_flg <> 1 ORDER BY user_id ASC LIMIT ?,10');
+//ユーザーの一覧情報の取得
+$users = $db->prepare('SELECT u.user_id, u.user_name, u.email, u.auth, u.lock_flg , a.auth_name FROM m_users as u INNER JOIN m_auth as a ON u.auth = a.auth AND u.del_flg <> 1 ORDER BY u.user_id ASC LIMIT ?,10');
 $users->bindParam(1, $start, PDO::PARAM_INT);
 $users->execute();
 ?>
@@ -44,14 +44,25 @@ $users->execute();
     <title>商品管理システム【ユーザー一覧画面】</title>
     <!-- <link rel="stylesheet" href="style.css"> -->
     <style>
-        html,
         body {
             height: 100;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 3%;
+            background-image: url("レトロ.jpg");
+        }
+
+        h1 {
+            margin-right: 20%;
+            margin-left: 20%;
+            background-color: whitesmoke;
+        }
+
+        h3 {
+            color: red;
         }
 
         table {
+            background-color: whitesmoke;
             width: 80%;
             height: 40%;
         }
@@ -85,7 +96,7 @@ $users->execute();
             <?php endif; ?>
             <?php unset($_SESSION['result']); ?>
 
-            <p style="font-size: 20px; margin-right: 15%; text-align: right;">
+            <p style="font-size: 20px; margin-left: 80%; text-align: right; background-color:whitesmoke; width: 100px;">
                 <a href="ins_users.php">新規追加</a>
 
             </p>
@@ -107,12 +118,22 @@ $users->execute();
                         <td><?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)) ?></td>
                         <td><?php print(htmlspecialchars($user['user_name'], ENT_QUOTES)) ?></td>
                         <td><?php print(htmlspecialchars($user['email'], ENT_QUOTES)) ?></td>
-                        <td><?php if ($user['auth'] === '1') : ?>管理者<?php elseif ($user['auth'] === '2') : ?>発注担当者<?php elseif ($user['auth'] === '3') : ?>閲覧者<?php endif; ?></td>
+                        <td><?php print(htmlspecialchars($user['auth_name'], ENT_QUOTES)) ?></td>
                         <td><?php if ($user['lock_flg'] === '1' || $user['lock_flg'] === '9') : ?>ロック中<?php endif; ?></td>
 
-                        <td><a href="upd_users.php?user_id=<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>">編集</a>
+                        <td>
+                            <a href="upd_users.php?user_id=<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>">編集</a>
+
+
+
+
                             |<input type="hidden" name="user_id" class="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>" />
-                            <a class="delete"" href="">削除</a>
+                            <a class="delete" href="">削除</a>
+
+
+
+
+
                             |<input type="hidden" name="user_id" class="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>" />
                             <a class="lock" href=""><?php if ($user['lock_flg'] === '0') : ?>ロック<?php elseif ($user['lock_flg'] === '1' || $user['lock_flg'] === '9') : ?>ロック解除<?php endif; ?></a>
                             </a>
@@ -124,7 +145,7 @@ $users->execute();
 
             <br>
 
-            <p style="margin-right: 20%; text-align: right;">
+            <p style="margin-left: 70%; text-align: right; background-color:whitesmoke; width: 250px;">
 
                 <?php if ($page > 1) : ?>
                     <a href="users.php?page=1">《</a>
@@ -146,7 +167,7 @@ $users->execute();
 
         </div>
         <a href="menu.php">
-            <p style="margin-left: 10%; text-align: left;">≪ 戻る
+            <p style="background-color:whitesmoke; margin-left: 10%; text-align: left; font-size: 18px; width: 75px;">≪ 戻る</p>
         </a>
     <?php endif; ?>
 </body>
