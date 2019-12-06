@@ -20,6 +20,10 @@ if ($user['user_id'] === $_SESSION['login']['user_id'] || $_POST['userid'] === $
     $authcontrol = $user['auth'];
 }
 
+// 権限マスタより権限情報を取得
+$auths = $db->query('SELECT auth, auth_name FROM m_auth');
+
+
 $errormessage  = '';
 $upduser = [];
 
@@ -135,10 +139,6 @@ if (!empty($_POST)) {
             color: red;
         }
 
-        strong {
-            background-color: #blue;
-        }
-
         table {
             margin-left: 20%;
             background-color: whitesmoke;
@@ -204,9 +204,10 @@ if (!empty($_POST)) {
                                 <strong style="width: 200px;">権限　　　　　　　　　</strong>
                                 <select name="auth" style="font-size: 18px; width: 500px;">
                                     <option value="">選択</option>
-                                    <option value=1>管理者</option>
-                                    <option value=2>発注担当者</option>
-                                    <option value=3>閲覧者</option>
+
+                                    <?php while ($selauth = $auths->fetch()) : ?>
+                                        <option value="<?php print(htmlspecialchars($selauth['auth'], ENT_QUOTES)); ?>"><?php print(htmlspecialchars($selauth['auth_name'], ENT_QUOTES)); ?></option>
+                                    <?php endwhile; ?>
                                 </select>
                             <?php elseif ($authcontrol === "1") : ?>
                                 <input type="hidden" name="auth" value=<?php print(htmlspecialchars($user['auth'], ENT_QUOTES)); ?>>
