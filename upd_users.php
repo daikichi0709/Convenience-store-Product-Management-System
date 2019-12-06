@@ -25,6 +25,7 @@ $auths = $db->query('SELECT auth, auth_name FROM m_auth');
 
 
 $errormessage  = '';
+$errorauth  = '';
 $upduser = [];
 
 if (!empty($_POST)) {
@@ -60,28 +61,40 @@ if (!empty($_POST)) {
     }
 
 
-    //ユーザーの一覧情報の取得
-    $spval = $db->prepare('SELECT auth_name FROM m_auth WHERE auth=?');
-    $spval->execute(array($upduser['auth']));
-    $authname = $spval->fetch();
+    // 権限 //
+    if (!empty($upduser['auth'])) {
+        //選択権限の存在チェック
+        $spval = $db->prepare('SELECT auth_name FROM m_auth WHERE auth=?');
+        $spval->execute(array($upduser['auth']));
+        $authname = $spval->fetch();
 
-    // 権限
-    if ($authcontrol === "1") {
-        if (empty($spval)) {
-            $errormessage .= "権限が未設定です<br>";
-        } elseif ($authname['auth_name'] !== '管理者') {
-            $errormessage .= "管理者権限ではありません<br>";
+        //比較用権限(全権限)
+        $checkauths = $db->query('SELECT auth, auth_name FROM m_auth');
+
+        //比較用権限（管理者権限）
+        $adminauth = $db->query('SELECT auth_name FROM m_auth WHERE auth = 1');
+
+        if ($authcontrol === "1") { //自分を選択（対象＝管理者）
+            if ($authname['auth_name'] !== $adminauth['auth_name']) {
+                $errorauth = "「管理者」権限ではありません<br>";
+            }
+        } else { //自分以外を選択
+            while ($checkauth = $checkauths->fetch()) {
+                // 権限マスタの保存分繰り返す
+                if ($authname['auth_name'] !== $checkauth['auth_name']) {
+                    $errorauth = "権限が設定外です<br>";
+                } else { //１つでも合うと権限のチェック処理を終了
+                    $errorauth = '';
+                    break;
+                }
+            }
         }
     } else {
-        if (empty($spval)) {
-            $errormessage .= "権限が未設定です<br>";
-        } elseif ($authname['auth_name'] !== '管理者' && $authname['auth_name'] !== '発注担当者' && $authname['auth_name'] !== '閲覧者') {
-            $errormessage .= "権限が設定外です<br>";
-        }
+        $errormessage .= "権限が未設定です<br>";
     }
 
     // ユーザー編集処理
-    if (empty($errormessage)) {
+    if (empty($errormessage) && empty($errorauth)) {
 
         //パスワードの暗号化
         $hash_pass = password_hash($upduser['password'], PASSWORD_DEFAULT);
@@ -154,8 +167,9 @@ if (!empty($_POST)) {
         <h1>ユーザー編集</h1>
         <hr>
         <!-- エラーメッセージ -->
-        <?php if (!empty($errormessage)) : ?>
+        <?php if (!empty($errormessage) || !empty($errorauth)) : ?>
             <p><?php echo $errormessage; ?></p>
+            <p><?php echo $errorauth; ?></p>
         <?php endif; ?>
         <table>
             <br>
@@ -206,7 +220,9 @@ if (!empty($_POST)) {
                                     <option value="">選択</option>
 
                                     <?php while ($selauth = $auths->fetch()) : ?>
+
                                         <option value="<?php print(htmlspecialchars($selauth['auth'], ENT_QUOTES)); ?>"><?php print(htmlspecialchars($selauth['auth_name'], ENT_QUOTES)); ?></option>
+
                                     <?php endwhile; ?>
                                 </select>
                             <?php elseif ($authcontrol === "1") : ?>
