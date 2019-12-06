@@ -61,6 +61,11 @@ if (!empty($_POST)) {
     }
 
 
+    $authcnt = $db->prepare('SELECT COUNT(auth) AS cut FROM m_auth WHERE auth=?');
+    $authcnt->execute(array($upduser['auth']));
+    $acnt = $authcnt->fetch();
+
+
     // 権限 //
     if (!empty($upduser['auth'])) {
         //選択権限の存在チェック
@@ -68,24 +73,19 @@ if (!empty($_POST)) {
         $spval->execute(array($upduser['auth']));
         $authname = $spval->fetch();
 
-        //比較用権限(全権限)
-        $checkauths = $db->query('SELECT auth, auth_name FROM m_auth');
-
         //比較用権限（管理者権限）
         $adminauth = $db->query('SELECT auth_name FROM m_auth WHERE auth = 1');
 
         if ($authcontrol === "1") { //自分を選択（対象＝管理者）
             if ($authname['auth_name'] !== $adminauth['auth_name']) {
                 $errorauth = "「管理者」権限ではありません<br>";
-            }
+
         } else { //自分以外を選択
-            while ($checkauth = $checkauths->fetch()) {
-                // 権限マスタの保存分繰り返す
-                if ($authname['auth_name'] !== $checkauth['auth_name']) {
+                //権限選択が正しければ「真」
+                if ($acnt['cut'] !== 1) {
                     $errorauth = "権限が設定外です<br>";
-                } else { //１つでも合うと権限のチェック処理を終了
+                } else {
                     $errorauth = '';
-                    break;
                 }
             }
         }
@@ -110,9 +110,8 @@ if (!empty($_POST)) {
         $_SESSION['result'] = 1; //更新完了フラグ
         header('Location: users.php');
         exit();
-    }
-}
-
+                }
+            }
 ?>
 
 
