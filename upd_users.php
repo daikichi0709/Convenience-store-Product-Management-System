@@ -2,6 +2,18 @@
 session_start();
 // DB接続
 require('Common.php');
+
+$keyid = $_SESSION['login']['user_id'];
+$login_userdata = $db->prepare('SELECT auth FROM m_users WHERE user_id=?');
+$login_userdata->execute(array($keyid));
+$auth = $login_userdata->fetch();
+
+if ($auth['auth'] !== "1") {
+    header('Location: error.php');
+    exit();
+}
+
+
 if (isset($_GET['user_id']) && is_numeric($_GET['user_id'])) {
     $id = $_GET['user_id'];
     $users = $db->prepare('SELECT user_id, user_name, email, password, auth FROM m_users WHERE user_id=?');
@@ -69,15 +81,15 @@ if (!empty($_POST)) {
         if ($authcontrol === "X") { //自分を選択（対象＝管理者）
             if ($authid['auth'] !== $user['auth']) {
                 $errorauth = "あなたは有効な権限では、ありません<br>";
-            } else { //自分以外を選択
-                $authcnt = $db->prepare('SELECT COUNT(auth) AS cut FROM m_auth WHERE auth=?');
-                $authcnt->execute(array($upduser['auth']));
-                $acnt = $authcnt->fetch();
+            }
+        } else { //自分以外を選択
+            $authcnt = $db->prepare('SELECT COUNT(auth) AS cut FROM m_auth WHERE auth=?');
+            $authcnt->execute(array($upduser['auth']));
+            $acnt = $authcnt->fetch();
 
-                //権限選択が正しければ「真」
-                if ($acnt['cut'] !== "1") {
-                    $errorauth = "権限が設定外です<br>";
-                }
+            //権限選択が正しければ「真」
+            if ($acnt['cut'] !== "1") {
+                $errorauth = "権限が設定外です<br>";
             }
         }
     } else {
