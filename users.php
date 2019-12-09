@@ -3,12 +3,18 @@ session_start();
 // DB接続
 require('Common.php');
 
+
 $ok_code = $_SESSION['result'];
 
 $keyid = $_SESSION['login']['user_id'];
 $login_userdata = $db->prepare('SELECT auth FROM m_users WHERE user_id=?');
 $login_userdata->execute(array($keyid));
 $auth = $login_userdata->fetch();
+
+if ($auth['auth'] !== "1") {
+    header('Location: error.php');
+    exit();
+}
 
 $page = $_REQUEST['page'];
 
@@ -76,7 +82,7 @@ $users->execute();
         <!-- ユーザー管理一覧へ画面遷移 -->
         <form action="menu.php">
             <div style="display:inline-flex;">
-                <input type="submit" value="メニュー画面へ移動" style="font-size: 30px; margin:50px; float:left; height: 100px; width: 300px; background-color:coral;" onmouseover="this.style.background='#99ccff'" onmouseout="this.style.background='#ff7f50';">
+                <input type="submit" value="メニュー画面へ移動" style="font-size: 30px; margin-top:100px; float:left; height: 200px; width: 500px; background-color:coral;" onmouseover="this.style.background='#99ccff'" onmouseout="this.style.background='#ff7f50';">
             </div>
         </form>
     <?php else : ?>
