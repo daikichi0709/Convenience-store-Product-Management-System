@@ -14,15 +14,14 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id'])) {
         exit();
     }
 }
-//権限制御
+//権限制御(変更できる権限のユーザーをオンにする)
 $authcontrol = "";
 if ($user['user_id'] === $_SESSION['login']['user_id'] || $_POST['userid'] === $_SESSION['login']['user_id']) {
-    $authcontrol = $user['auth'];
+    $authcontrol = "X";
 }
 
 // 権限マスタより権限情報を取得
 $auths = $db->query('SELECT auth, auth_name FROM m_auth');
-
 
 $errormessage  = '';
 $errorauth  = '';
@@ -59,40 +58,34 @@ if (!empty($_POST)) {
             $errormessage .= "パスワードが一致しません<br>";
         }
     }
-
-
-    $authcnt = $db->prepare('SELECT COUNT(auth) AS cut FROM m_auth WHERE auth=?');
-    $authcnt->execute(array($upduser['auth']));
-    $acnt = $authcnt->fetch();
-
-
+    echo $user['auth'];
+    echo $upduser['auth'];
     // 権限 //
-    if (!empty($upduser['auth'])) {
+    if (!empty($user['auth'])) {
         //選択権限の存在チェック
-        $spval = $db->prepare('SELECT auth_name FROM m_auth WHERE auth=?');
+        $spval = $db->prepare('SELECT auth FROM m_auth WHERE auth=?');
         $spval->execute(array($upduser['auth']));
-        $authname = $spval->fetch();
+        $authid = $spval->fetch();
 
-        //比較用権限（管理者権限）
-        $adminauth = $db->query('SELECT auth_name FROM m_auth WHERE auth = 1');
+        if ($authcontrol === "X") { //自分を選択（対象＝管理者）
+            if ($authid['auth'] !== $user['auth']) {
+                $errorauth = "あなたは有効な権限では、ありません<br>";
+            } else { //自分以外を選択
+                $authcnt = $db->prepare('SELECT COUNT(auth) AS cut FROM m_auth WHERE auth=?');
+                $authcnt->execute(array($upduser['auth']));
+                $acnt = $authcnt->fetch();
 
-        if ($authcontrol === "1") { //自分を選択（対象＝管理者）
-            if ($authname['auth_name'] !== $adminauth['auth_name']) {
-                $errorauth = "「管理者」権限ではありません<br>";
-
-        } else { //自分以外を選択
                 //権限選択が正しければ「真」
-                if ($acnt['cut'] !== 1) {
+                if ($acnt['cut'] !== "1") {
                     $errorauth = "権限が設定外です<br>";
-                } else {
-                    $errorauth = '';
                 }
             }
         }
     } else {
         $errormessage .= "権限が未設定です<br>";
     }
-
+    echo $user['auth'];
+    echo $upduser['auth'];
     // ユーザー編集処理
     if (empty($errormessage) && empty($errorauth)) {
 
@@ -110,8 +103,8 @@ if (!empty($_POST)) {
         $_SESSION['result'] = 1; //更新完了フラグ
         header('Location: users.php');
         exit();
-                }
-            }
+    }
+}
 ?>
 
 
@@ -212,19 +205,20 @@ if (!empty($_POST)) {
                             <input type="text" placeholder="確認のため設定したパスワードを入力してください" name="protpassword" maxlength="255" style="font-size: 18px; width: 500px;">
 
                             <br><br>
-                            <?php if ($authcontrol !== "1") : ?>
+                            <?php if ($authcontrol !== "X") : ?>
                                 <!-- 権限 -->
                                 <strong style="width: 200px;">権限　　　　　　　　　</strong>
                                 <select name="auth" style="font-size: 18px; width: 500px;">
                                     <option value="">選択</option>
 
+                                    <!-- 権限マスタ内の権限をすべて表示 -->
                                     <?php while ($selauth = $auths->fetch()) : ?>
 
                                         <option value="<?php print(htmlspecialchars($selauth['auth'], ENT_QUOTES)); ?>"><?php print(htmlspecialchars($selauth['auth_name'], ENT_QUOTES)); ?></option>
 
                                     <?php endwhile; ?>
                                 </select>
-                            <?php elseif ($authcontrol === "1") : ?>
+                            <?php else : ?>
                                 <input type="hidden" name="auth" value=<?php print(htmlspecialchars($user['auth'], ENT_QUOTES)); ?>>
                             <?php endif; ?>
                         </div>
