@@ -3,7 +3,6 @@ session_start();
 // DB接続
 require('Common.php');
 
-
 $ok_code = $_SESSION['result'];
 
 $keyid = $_SESSION['login']['user_id'];
@@ -78,104 +77,85 @@ $users->execute();
 </head>
 
 <body>
-    <?php if ($auth['auth'] !== "1") : ?>
-        <!-- ユーザー管理一覧へ画面遷移 -->
-        <form action="menu.php">
-            <div style="display:inline-flex;">
-                <input type="submit" value="メニュー画面へ移動" style="font-size: 30px; margin-top:100px; float:left; height: 200px; width: 500px; background-color:coral;" onmouseover="this.style.background='#99ccff'" onmouseout="this.style.background='#ff7f50';">
-            </div>
-        </form>
-    <?php else : ?>
-
-        <div>
-            <a>
-                <h1>ユーザー一覧</h1>
-            </a>
-            <?php if ($ok_code === 1) : ?>
-                <script>
-                    alert('登録が完了しました')
-                </script>
-            <?php elseif ($ok_code === 2) : ?>
-                <script>
-                    alert('ユーザーが存在しません')
-                </script>
-            <?php endif; ?>
-            <?php unset($_SESSION['result']); ?>
-
-            <p style="font-size: 20px; margin-left: 80%; text-align: right; background-color:whitesmoke; width: 100px;">
-                <a href="ins_users.php">新規追加</a>
-
-            </p>
-
-            <table align="center" border="3" style="font-size: 24px;">
-                <!-- 1行目：項目名 -->
-                <tr>
-                    <th>NO.</th>
-                    <th>ユーザー名</th>
-                    <th>メールアドレス</th>
-                    <th>権限</th>
-                    <th>ロック<br>状態</th>
-                    <th>　</th>
-                </tr>
-
-                <!-- 2行目以降：項目 -->
-                <?php while ($user = $users->fetch()) : ?>
-                    <tr>
-                        <td><?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)) ?></td>
-                        <td><?php print(htmlspecialchars($user['user_name'], ENT_QUOTES)) ?></td>
-                        <td><?php print(htmlspecialchars($user['email'], ENT_QUOTES)) ?></td>
-                        <td><?php print(htmlspecialchars($user['auth_name'], ENT_QUOTES)) ?></td>
-                        <td><?php if ($user['lock_flg'] === '1' || $user['lock_flg'] === '9') : ?>ロック中<?php endif; ?></td>
-
-                        <td>
-                            <a href="upd_users.php?user_id=<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>">編集</a>
-
-
-
-
-                            |<input type="hidden" name="user_id" class="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>" />
-                            <a class="delete" href="">削除</a>
-
-
-
-
-
-                            |<input type="hidden" name="user_id" class="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>" />
-                            <a class="lock" href=""><?php if ($user['lock_flg'] === '0') : ?>ロック<?php elseif ($user['lock_flg'] === '1' || $user['lock_flg'] === '9') : ?>ロック解除<?php endif; ?></a>
-                            </a>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-
-            </table>
-
-            <br>
-
-            <p style="margin-left: 70%; text-align: right; background-color:whitesmoke; width: 250px;">
-
-                <?php if ($page > 1) : ?>
-                    <a href="users.php?page=1">《</a>
-                    <a href="users.php?page=<?php print(htmlspecialchars($page - 1)); ?>">〈</a>
-                    <?php else : ?>《〈
-                <?php endif; ?>
-
-                <?php for ($pagecut = 1; $pagecut <= $maxPage; $pagecut++) : ?>
-                    <a href="users.php?page=<?php print(htmlspecialchars($pagecut)); ?>"><?php print(htmlspecialchars($pagecut)); ?></a>
-                <?php endfor; ?>
-
-                <?php if ($page < $maxPage) : ?>
-                    <a href="users.php?page=<?php print(htmlspecialchars($page + 1)); ?>">〉</a>
-                    <a href="users.php?page=<?php print(htmlspecialchars($maxPage)); ?>">》</a>
-                    <?php else : ?>〉》
-                <?php endif; ?>
-
-            </p>
-
-        </div>
-        <a href="menu.php">
-            <p style="background-color:whitesmoke; margin-left: 10%; text-align: left; font-size: 18px; width: 75px;">≪ 戻る</p>
+    <div>
+        <a>
+            <h1>ユーザー一覧</h1>
         </a>
-    <?php endif; ?>
+        <?php if ($ok_code === 1) : ?>
+            <script>
+                alert('登録が完了しました')
+            </script>
+        <?php elseif ($ok_code === 2) : ?>
+            <script>
+                alert('ユーザーが存在しません')
+            </script>
+        <?php endif; ?>
+        <?php unset($_SESSION['result']); ?>
+
+        <p style="font-size: 20px; margin-left: 80%; text-align: right; background-color:whitesmoke; width: 100px;">
+            <a href="ins_users.php">新規追加</a>
+
+        </p>
+
+        <table align="center" border="3" style="font-size: 24px;">
+            <!-- 1行目：項目名 -->
+            <tr>
+                <th>NO.</th>
+                <th>ユーザー名</th>
+                <th>メールアドレス</th>
+                <th>権限</th>
+                <th>ロック<br>状態</th>
+                <th>　</th>
+            </tr>
+
+            <!-- 2行目以降：項目 -->
+            <?php while ($user = $users->fetch()) : ?>
+                <tr>
+                    <td><?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($user['user_name'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($user['email'], ENT_QUOTES)) ?></td>
+                    <td><?php print(htmlspecialchars($user['auth_name'], ENT_QUOTES)) ?></td>
+                    <td><?php if ($user['lock_flg'] === '1' || $user['lock_flg'] === '9') : ?>ロック中<?php endif; ?></td>
+
+                    <td>
+                        <a href="upd_users.php?user_id=<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>">編集</a>
+                        |<input type="hidden" name="user_id" class="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>" />
+                        <a class="delete" href="">削除</a>
+                        |<input type="hidden" name="user_id" class="user_id" value="<?php print(htmlspecialchars($user['user_id'], ENT_QUOTES)); ?>" />
+                        <a class="lock" href=""><?php if ($user['lock_flg'] === '0') : ?>ロック<?php elseif ($user['lock_flg'] === '1' || $user['lock_flg'] === '9') : ?>ロック解除<?php endif; ?></a>
+                        </a>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+
+        </table>
+
+        <br>
+
+        <p style="margin-left: 70%; text-align: right; background-color:whitesmoke; width: 250px;">
+
+            <?php if ($page > 1) : ?>
+                <a href="users.php?page=1">《</a>
+                <a href="users.php?page=<?php print(htmlspecialchars($page - 1)); ?>">〈</a>
+                <?php else : ?>《〈
+            <?php endif; ?>
+
+            <?php for ($pagecut = 1; $pagecut <= $maxPage; $pagecut++) : ?>
+                <a href="users.php?page=<?php print(htmlspecialchars($pagecut)); ?>"><?php print(htmlspecialchars($pagecut)); ?></a>
+            <?php endfor; ?>
+
+            <?php if ($page < $maxPage) : ?>
+                <a href="users.php?page=<?php print(htmlspecialchars($page + 1)); ?>">〉</a>
+                <a href="users.php?page=<?php print(htmlspecialchars($maxPage)); ?>">》</a>
+                <?php else : ?>〉》
+            <?php endif; ?>
+
+        </p>
+
+    </div>
+    <a href="menu.php">
+        <p style="background-color:whitesmoke; margin-left: 10%; text-align: left; font-size: 18px; width: 75px;">≪ 戻る</p>
+    </a>
 </body>
 
 </html>
