@@ -58,8 +58,7 @@ if (!empty($_POST)) {
             $errormessage .= "パスワードが一致しません<br>";
         }
     }
-    echo $user['auth'];
-    echo $upduser['auth'];
+
     // 権限 //
     if (!empty($user['auth'])) {
         //選択権限の存在チェック
@@ -84,8 +83,7 @@ if (!empty($_POST)) {
     } else {
         $errormessage .= "権限が未設定です<br>";
     }
-    echo $user['auth'];
-    echo $upduser['auth'];
+
     // ユーザー編集処理
     if (empty($errormessage) && empty($errorauth)) {
 
