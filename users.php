@@ -15,7 +15,7 @@ if ($auth['auth'] !== "1") {
     exit();
 }
 
-$page = $_REQUEST['page'];
+$page = $_GET['page'];
 
 if (empty($page)) {
     $page = 1;
