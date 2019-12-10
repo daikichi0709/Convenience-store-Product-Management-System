@@ -68,14 +68,13 @@ if (!empty($_POST)) {
 
     // ユーザー登録処理
     if (empty($errormessage)) {
-        $statement = $db->prepare('INSERT INTO m_users SET user_name=?, email=?, password=?, auth=?, ins_user_id=?, upd_user_id=?, ins_date=?, upd_date=?, last_login_date=?, login_fail_cut=0, del_flg=0, lock_flg=0');
-
         //パスワードの暗号化
         $hash_pass = password_hash($join['password'], PASSWORD_DEFAULT);
         //日時設定
         $today = new DateTime();
         $instime = $today->format('Y-m-d H:i:s');
 
+        $statement = $db->prepare('INSERT INTO m_users SET user_name=?, email=?, password=?, auth=?, ins_user_id=?, upd_user_id=?, ins_date=?, upd_date=?, last_login_date=?, login_fail_cut=0, del_flg=0, lock_flg=0');
         $statement->execute(array($join['user_name'], $join['email'], $hash_pass, $join['auth'], $_SESSION['login']['user_id'], $_SESSION['login']['user_id'], $instime, $instime, $instime));
 
         $_SESSION['result'] = 1; //更新完了フラグ
@@ -105,7 +104,7 @@ if (!empty($_POST)) {
         h1 {
             margin-left: 40%;
             width: 300px;
-            background-color: #ffff52;
+            background-color: whitesmoke;
         }
 
         p {
@@ -163,10 +162,7 @@ if (!empty($_POST)) {
                             <br><br>
                             <!-- パスワード -->
                             <strong style="width: 200px;">パスワード　　　　　　</strong>
-                            <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px" value="<?php if (!empty($_POST)) {
-                                                                                                                                                                print(htmlspecialchars($_POST['password'], ENT_QUOTES));
-                                                                                                                                                            }
-                                                                                                                                                            ?>">
+                            <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px">
 
                             <br><br>
                             <!-- パスワード（確認） -->
