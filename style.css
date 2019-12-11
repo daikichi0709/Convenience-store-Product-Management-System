@@ -1,0 +1,60 @@
+body {
+    height: 100;
+    text-align: center;
+    margin-top: 3%;
+    background-image: url("柄.jpg");
+}
+
+h1 {
+    margin-left: 25%;
+    margin-right: 25%;
+    width: 50%;
+    background-color: whitesmoke;
+}
+
+p {
+    background-color: #ffff45;
+    color: rgb(66, 155, 128);
+    margin-left: 35%;
+    margin-right: 35%;
+    font-size: 20px;
+}
+
+.usertab {
+    width: 20%;
+    font-size: 20px;
+    text-align: right;
+    margin-left: 60%;
+}
+
+.usertab2 {
+    width: 7%;
+    font-size: 20px;
+    text-align: right;
+    margin-left: 72%;
+}
+
+.backtab {
+    background-color:whitesmoke;
+    margin-left: 20%;
+    text-align: left;
+    font-size: 18px;
+    width: 80px;
+}
+
+h3 {
+    color: red;
+}
+
+table {
+    margin-left: 20%;
+    margin-right: 20%;
+    text-align: center;
+    background-color: white;
+    width: 60%;
+    height: 50%;
+}
+
+strong{
+    width: 200px;
+}
