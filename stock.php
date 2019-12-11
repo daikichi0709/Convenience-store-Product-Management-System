@@ -6,7 +6,7 @@ require('Common.php');
 
 $ok_code = $_SESSION['result'];
 
-$page = $_REQUEST['page'];
+$page = $_GET['page'];
 
 if (empty($page)) {
     $page = 1;
@@ -45,20 +45,8 @@ $auth = $login_userdata->fetch();
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width,">
     <title>商品管理システム【在庫一覧画面】</title>
-    <!-- <link rel="stylesheet" href="style.css"> -->
-    <style>
-        html,
-        body {
-            height: 100;
-            text-align: center;
-            margin-top: 20px;
-        }
+    <link rel="stylesheet" href="style.css">
 
-        table {
-            width: 80%;
-            height: 40%;
-        }
-    </style>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="js/sample.js"></script>
 </head>
@@ -66,9 +54,8 @@ $auth = $login_userdata->fetch();
 <body>
     <div>
 
-        <a>
-            <h1>在庫一覧</h1>
-        </a>
+        <h1>在庫一覧</h1>
+
         <?php if ($ok_code === 1) : ?>
             <script>
                 alert('登録が完了しました')
@@ -81,13 +68,13 @@ $auth = $login_userdata->fetch();
         <?php unset($_SESSION['result']); ?>
 
         <?php if ($auth['auth'] === "1" || $auth['auth'] === "2") : ?>
-            <p style="font-size: 20px; margin-right: 10%; text-align: right;">
+            <p class="admintab">
                 <a href="ins_product.php">新規追加</a>
                 <a href="download.php">CSVダウンロード</a>
             </p>
         <?php endif; ?>
 
-        <table align="center" border="3" style="font-size: 24px;">
+        <table border="3" style="font-size: 24px;">
 
             <tr>
                 <th>NO.</th>
@@ -129,7 +116,7 @@ $auth = $login_userdata->fetch();
         </table>
         <br>
 
-        <p style="margin-right: 20%; text-align: right;">
+        <p style="margin-left: 70%; text-align: right; background-color:whitesmoke; width: 250px;">
 
             <?php if ($page > 1) : ?>
                 <a href="stock.php?page=1">《</a>
@@ -152,7 +139,7 @@ $auth = $login_userdata->fetch();
 
     </div>
     <a href="menu.php">
-        <p style="margin-left: 10%; text-align: left;">≪ 戻る</p>
+        <p class="backtab">≪ 戻る</p>
     </a>
 </body>
 
