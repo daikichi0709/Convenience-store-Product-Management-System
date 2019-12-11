@@ -1,0 +1,60 @@
+body {
+    height: 100px;
+    text-align: center;
+    margin-top: 3%;
+    background-image: url("wallpaper.jpg");
+}
+
+h1 {
+    margin-left: 25%;
+    margin-right: 25%;
+    width: 50%;
+    background-color: #eeeeee;
+}
+
+p {
+    background-color: #ffff45;
+    color: #4ca37f;
+    margin-left: 35%;
+    margin-right: 35%;
+    font-size: 20px;
+}
+
+.admintab {
+    width: 20%;
+    font-size: 20px;
+    text-align: right;
+    margin-left: 60%;
+}
+
+.notadmintab {
+    width: 7%;
+    font-size: 20px;
+    text-align: right;
+    margin-left: 72%;
+}
+
+.backtab {
+    background-color:#eeeeee;
+    margin-left: 20%;
+    text-align: left;
+    font-size: 18px;
+    width: 80px;
+}
+
+h3 {
+    color: #ff0000;
+}
+
+table {
+    margin-left: 20%;
+    margin-right: 20%;
+    text-align: center;
+    background-color: #ffffff;
+    width: 60%;
+    height: 50%;
+}
+
+strong{
+    width: 200px;
+}
