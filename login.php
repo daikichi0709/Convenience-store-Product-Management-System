@@ -1,10 +1,10 @@
 <?php
-$_REQUEST['loginpage'] = 1;
+$_POST['loginpage'] = 1;
 session_start();
 // DB接続
 require('Common.php');
 
-if (!empty($_POST)) {
+if (!empty($_POST['email']) || !empty($_POST['password'])) {
     //ログイン失敗したら（一度チェックを通過するから）
     $error['login'] = 'ログインに失敗しました';
 
@@ -96,15 +96,8 @@ session_destroy();
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width,">
     <title>商品管理システム【ログイン画面】</title>
-    <!-- <link rel="stylesheet" href="style.css"> -->
-    <style>
-        html,
-        body {
-            height: 100;
-            text-align: center;
-            margin-top: 3%;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -113,7 +106,7 @@ session_destroy();
             <h1>商品管理システム</h1>
         </a>
 
-        <h3 style="color: red;">
+        <h3>
             <!-- ログイン失敗 -->
             <?php
             if ($error['login'] !== '') :
@@ -124,7 +117,7 @@ session_destroy();
             <?php endif; ?>
         </h3>
 
-        <form method="post" style="margin-top: 7%;">
+        <form method="post" style="margin-top: 7%; background-color: whitesmoke; margin-right: 30%; margin-left: 30%;">
             <div style="font-size: 24px">
                 <!-- メールアドレス入力 -->
                 <strong>メールアドレス　　　</strong>
