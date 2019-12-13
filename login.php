@@ -1,5 +1,5 @@
 <?php
-$_POST['loginpage'] = 1;
+$loginpage = 1;
 session_start();
 // DB接続
 require('Common.php');
