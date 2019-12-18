@@ -7,7 +7,7 @@ try {
 }
 
 //正規のログインせず、他画面に遷移すのを防ぐ
-if (empty($_REQUEST['loginpage']) && $_REQUEST['loginpage'] !== 1) {
+if ($loginpage !== 1) {
     if (empty($_SESSION['login'])) {
         header('Location: login.php');
         exit();
