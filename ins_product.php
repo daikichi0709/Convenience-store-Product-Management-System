@@ -46,7 +46,7 @@ if (!empty($_POST)) {
 
     // 価格
     if (preg_match("/^[0-9]+$/", $itemarray['price'])) {
-        if (strlen($itemarray['price']) > 6) {
+        if ((strlen($itemarray['price']) > 6) || ($itemarray['price'] < 0 || $itemarray['price'] > 100000)) {
             $errormessage .= "価格に設定できる金額を超えています" . "<br>";
         }
     } elseif (empty($itemarray['price'])) {
@@ -57,7 +57,7 @@ if (!empty($_POST)) {
 
     // 仕入れ価格
     if (preg_match("/^[0-9]+$/", $itemarray['w_price'])) {
-        if (strlen($itemarray['w_price']) > 6) {
+        if ((strlen($itemarray['w_price']) > 6) || ($itemarray['price'] < 0 || $itemarray['price'] > 100000)) {
             $errormessage .= "仕入れ価格に設定できる金額を超えています" . "<br>";
         }
     } elseif (empty($itemarray['w_price'])) {
@@ -68,7 +68,7 @@ if (!empty($_POST)) {
 
     // 在庫数
     if (preg_match("/^[0-9]+$/", $itemarray['stock'])) {
-        if (strlen($itemarray['stock']) > 3) {
+        if ((strlen($itemarray['stock']) > 3) || ($itemarray['stock'] < 0 || $itemarray['stock'] > 100)) {
             $errormessage .= "在庫数に設定できる数量を超えています" . "<br>";
         }
     } elseif (empty($itemarray['stock'])) {
@@ -115,80 +115,77 @@ if (!empty($_POST)) {
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width,">
     <title>商品管理システム【商品登録画面】</title>
-    <!-- <link rel="stylesheet" href="style.css"> -->
-    <style>
-        html,
-        body {
-            height: 100;
-            text-align: center;
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
     <div>
 
         <h1>商品登録</h1>
-        <hr>
         <!-- エラーメッセージ -->
         <?php if (!empty($errormessage)) : ?>
-            <p style="color: red; font-size: 20px;"><?php echo $errormessage; ?></p>
+            <h3><?php echo $errormessage; ?></h3>
         <?php endif; ?>
 
+        <table>
+            <tr>
+                <td>
+                    <form action="" method="post">
+                        <div style="font-size: 24px;">
+                            <!-- 商品名 -->
+                            <strong>商品名　　　　　</strong>
+                            <input type="text" placeholder="商品名を入力して下さい" name="item_name" maxlength="255" value="<?php print(htmlspecialchars($_POST['item_name'], ENT_QUOTES)); ?>" style="width: 500px">
 
-        <form action="" method="post">
-            <div style="font-size: 24px;">
-                <!-- 商品名 -->
-                <strong style="width: 200px;">商品名　　　　　</strong>
-                <input type="text" placeholder="商品名を入力して下さい" name="item_name" maxlength="255" value="<?php print(htmlspecialchars($_POST['item_name'], ENT_QUOTES)); ?>" style="width: 500px">
+                            <br><br>
+                            <!-- 商品説明 -->
+                            <strong>商品説明　　　　</strong>
+                            <input type="text" placeholder="商品説明を入力して下さい" name="item_desc" maxlength="255" value="<?php print(htmlspecialchars($_POST['item_desc'], ENT_QUOTES)); ?>" style="width: 500px">
 
-                <br><br>
-                <!-- 商品説明 -->
-                <strong style="width: 200px;">商品説明　　　　</strong>
-                <input type="text" placeholder="商品説明を入力して下さい" name="item_desc" maxlength="255" value="<?php print(htmlspecialchars($_POST['item_desc'], ENT_QUOTES)); ?>" style="width: 500px">
+                            <br><br>
+                            <!-- 仕入先 -->
+                            <strong>仕入先　　　　　</strong>
+                            <input type="text" placeholder="仕入先を入力して下さい" name="item_comp" maxlength="255" value="<?php print(htmlspecialchars($_POST['item_comp'], ENT_QUOTES)); ?>" style="width: 500px">
+                            <br><br>
+                            <!-- 生産国 -->
+                            <strong>生産国　　　　　</strong>
+                            <input type="text" placeholder="生産国を入力して下さい" name="country" maxlength="255" value="<?php print(htmlspecialchars($_POST['country'], ENT_QUOTES)); ?>" style="width: 500px">
 
-                <br><br>
-                <!-- 仕入先 -->
-                <strong style="width: 200px;">仕入先　　　　　</strong>
-                <input type="text" placeholder="仕入先を入力して下さい" name="item_comp" maxlength="255" value="<?php print(htmlspecialchars($_POST['item_comp'], ENT_QUOTES)); ?>" style="width: 500px">
-                <br><br>
-                <!-- 生産国 -->
-                <strong style="width: 200px;">生産国　　　　　</strong>
-                <input type="text" placeholder="生産国を入力して下さい" name="country" maxlength="255" value="<?php print(htmlspecialchars($_POST['country'], ENT_QUOTES)); ?>" style="width: 500px">
+                            <br><br>
+                            <!-- 価格 -->
+                            <strong>価格　　　　　　</strong>
+                            <input type="text" placeholder="価格を入力して下さい" name="price" maxlength="255" value="<?php print(htmlspecialchars($_POST['price'], ENT_QUOTES)); ?>" style="width: 500px">
 
-                <br><br>
-                <!-- 価格 -->
-                <strong style="width: 200px;">価格　　　　　　</strong>
-                <input type="text" placeholder="価格を入力して下さい" name="price" maxlength="255" value="<?php print(htmlspecialchars($_POST['price'], ENT_QUOTES)); ?>" style="width: 500px">
+                            <br><br>
+                            <!-- 仕入れ価格 -->
+                            <strong>仕入れ価格　　　</strong>
+                            <input type="text" placeholder="仕入れ価格を入力して下さい" name="w_price" maxlength="255" value="<?php print(htmlspecialchars($_POST['w_price'], ENT_QUOTES)); ?>" style="width: 500px">
 
-                <br><br>
-                <!-- 仕入れ価格 -->
-                <strong style="width: 200px;">仕入れ価格　　　</strong>
-                <input type="text" placeholder="仕入れ価格を入力して下さい" name="w_price" maxlength="255" value="<?php print(htmlspecialchars($_POST['w_price'], ENT_QUOTES)); ?>" style="width: 500px">
+                            <br><br>
+                            <!-- 在庫数 -->
+                            <strong>在庫数　　　　　</strong>
+                            <input type="text" placeholder="在庫数を入力して下さい" name="stock" maxlength="255" value="<?php print(htmlspecialchars($_POST['stock'], ENT_QUOTES)); ?>" style="width: 500px">
 
-                <br><br>
-                <!-- 在庫数 -->
-                <strong style="width: 200px;">在庫数　　　　　</strong>
-                <input type="text" placeholder="在庫数を入力して下さい" name="stock" maxlength="255" value="<?php print(htmlspecialchars($_POST['stock'], ENT_QUOTES)); ?>" style="width: 500px">
+                            <br><br>
+                            <!-- 入荷日 -->
+                            <strong>入荷日　　　　　</strong>
+                            <input type="text" placeholder="入荷日を入力して下さい(年-月-日：yyyy-mm-dd)" name="day" maxlength="255" value="<?php print(htmlspecialchars($_POST['day'], ENT_QUOTES)); ?>" style="width: 500px">
 
-                <br><br>
-                <!-- 入荷日 -->
-                <strong style="width: 200px;">入荷日　　　　　</strong>
-                <input type="text" placeholder="入荷日を入力して下さい(年-月-日：yyyy-mm-dd)" name="day" maxlength="255" value="<?php print(htmlspecialchars($_POST['day'], ENT_QUOTES)); ?>" style="width: 500px">
+                        </div>
 
-            </div>
+                        <br><br>
 
-            <br><br>
-
-            <div>
-                <!-- 登録ボタン -->
-                <input type="submit" value="登録" style="font-size: 30px; width: 150px; height: 50px;">
-            </div>
-        </form>
+                        <div>
+                            <!-- 登録ボタン -->
+                            <input type="submit" value="登録" style="font-size: 30px; width: 150px; height: 50px;">
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        </table>
     </div>
     <a href="stock.php">
-        <p style="margin-left: 20%; text-align: left;">≪ 戻る</p>
+        <p style="background-color:whitesmoke; margin-left: 20%; text-align: left; font-size: 18px; width: 80px;">≪ 戻る</p>
     </a>
 </body>
 
