@@ -72,7 +72,7 @@ if (!empty($_POST)) {
     }
 
     // 権限 //
-    if (!empty($user['auth'])) {
+    if (!empty($upduser['auth'])) {
         //選択権限の存在チェック
         $spval = $db->prepare('SELECT auth FROM m_auth WHERE auth=?');
         $spval->execute(array($upduser['auth']));
@@ -98,7 +98,6 @@ if (!empty($_POST)) {
 
     // ユーザー編集処理
     if (empty($errormessage) && empty($errorauth)) {
-
         //パスワードの暗号化
         $hash_pass = password_hash($upduser['password'], PASSWORD_DEFAULT);
 
@@ -127,47 +126,13 @@ if (!empty($_POST)) {
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width,">
     <title>商品管理システム【ユーザー更新画面】</title>
-    <!-- <link rel="stylesheet" href="style.css"> -->
-    <style>
-        body {
-            height: 100;
-            text-align: center;
-            margin-top: 3%;
-            background-image: url("ラベンダー.jpg");
-        }
+    <link rel="stylesheet" href="style.css">
 
-        h1 {
-            margin-left: 40%;
-            width: 300px;
-            background-color: #ffff52;
-        }
-
-        p {
-            background-color: white;
-            color: red;
-            margin-left: 35%;
-            margin-right: 35%;
-            font-size: 20px;
-        }
-
-        h3 {
-            color: red;
-        }
-
-        table {
-            margin-left: 20%;
-            background-color: whitesmoke;
-            width: 60%;
-            height: 50%;
-            text-align: center;
-        }
-    </style>
 </head>
 
 <body>
     <div style="font-size: 24px">
         <h1>ユーザー編集</h1>
-        <hr>
         <!-- エラーメッセージ -->
         <?php if (!empty($errormessage) || !empty($errorauth)) : ?>
             <p><?php echo $errormessage; ?></p>
@@ -186,7 +151,7 @@ if (!empty($_POST)) {
                                                                     ?>">
                         <div style="font-size: 24px">
                             <!-- ユーザー名 -->
-                            <strong style="width: 200px;">ユーザー名　　　　　　</strong>
+                            <strong>ユーザー名　　　　　　</strong>
                             <input type="text" placeholder="ユーザー名を入力してください" name="user_name" maxlength="255" style="font-size: 18px; width: 500px;" value="<?php if (empty($_POST['user_name'])) {
                                                                                                                                                                 print(htmlspecialchars($user['user_name'], ENT_QUOTES));
                                                                                                                                                             } else {
@@ -196,7 +161,7 @@ if (!empty($_POST)) {
 
                             <br><br>
                             <!-- メールアドレス -->
-                            <strong style="width: 200px;">メールアドレス　　　　</strong>
+                            <strong>メールアドレス　　　　</strong>
                             <input type="text" placeholder="メールアドレスを入力してください" name="email" maxlength="255" style="font-size: 18px; width: 500px;" value="<?php if (empty($_POST['email'])) {
                                                                                                                                                                 print(htmlspecialchars($user['email'], ENT_QUOTES));
                                                                                                                                                             } else {
@@ -206,20 +171,20 @@ if (!empty($_POST)) {
 
                             <br><br>
                             <!-- パスワード -->
-                            <strong style="width: 200px;">パスワード　　　　　　</strong>
+                            <strong>パスワード　　　　　　</strong>
                             <input type="text" placeholder="パスワードを設定してください" name="password" maxlength="255" style="font-size: 18px; width: 500px;">
 
                             <br><br>
                             <!-- パスワード（確認） -->
-                            <strong style="width: 200px;">パスワード（確認）　　</strong>
+                            <strong>パスワード（確認）　　</strong>
                             <input type="text" placeholder="確認のため設定したパスワードを入力してください" name="protpassword" maxlength="255" style="font-size: 18px; width: 500px;">
 
                             <br><br>
                             <?php if ($authcontrol !== "X") : ?>
                                 <!-- 権限 -->
-                                <strong style="width: 200px;">権限　　　　　　　　　</strong>
+                                <strong>権限　　　　　　　　　</strong>
                                 <select name="auth" style="font-size: 18px; width: 500px;">
-                                    <option value="">選択</option>
+                                    <option value="0">選択</option>
 
                                     <!-- 権限マスタ内の権限をすべて表示 -->
                                     <?php while ($selauth = $auths->fetch()) : ?>
@@ -245,7 +210,7 @@ if (!empty($_POST)) {
         </table>
     </div>
     <a href="users.php">
-        <p style="background-color:whitesmoke; margin-left: 20%; text-align: left; font-size: 18px; width: 75px;">≪ 戻る</p>
+        <p class="backtab">≪ 戻る</p>
     </a>
 </body>
 
