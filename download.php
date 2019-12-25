@@ -8,10 +8,6 @@ $login_userdata = $db->prepare('SELECT auth FROM m_users WHERE user_id=?');
 $login_userdata->execute(array($keyid));
 $auth = $login_userdata->fetch();
 
-if ($auth['auth'] !== "1" && $auth['auth'] !== "2") {
-    header('Location: error.php');
-    exit();
-}
 
 // 出力情報の設定
 header("Content-Type: application/octet-stream");
