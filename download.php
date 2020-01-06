@@ -3,6 +3,12 @@ session_start();
 // DB接続
 require('Common.php');
 
+$keyid = $_SESSION['login']['user_id'];
+$login_userdata = $db->prepare('SELECT auth FROM m_users WHERE user_id=?');
+$login_userdata->execute(array($keyid));
+$auth = $login_userdata->fetch();
+
+
 // 出力情報の設定
 header("Content-Type: application/octet-stream");
 header("Content-Disposition: attachment; filename=DownloadProduct.csv");
